@@ -1,0 +1,9 @@
+.box1 {
+    display: flex;
+    width: 300px;
+    background-color: red;
+}
+
+.box1 h1 {
+    color: blue;
+}
