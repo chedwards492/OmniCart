@@ -4,7 +4,8 @@ document.addEventListener("click", () => {
 
 });
 
-
+/*STOPPPPPP WAIIIIIIT CUZ there's a chance we won't be able to access the HTML b/c there is probably js on the page
+so might have to scrape with python or something similar so not worth writing out the logic in js rn*/ 
 
 /* Here begins the process of trying to create a spew logic and conditional statements "smart" enough to 
     distinguish a product title, image, and price from other text on a page. Program this last b/c it's not

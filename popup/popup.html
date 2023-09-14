@@ -5,15 +5,30 @@
         <link rel="stylesheet" href="popup.css">
 
         <title>OmniCart</title>
-    </head>
-    <body>
-        <div class="box1">
-            <h1>waddup</h1>
-        </div>
 
-        <div class="box2">
-            <p>setBadgeText text</p>
-        </div>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet">
+    </head>
+    <body style="background-color: #FFFBEA;">
+        <main class="main">
+            <h1 class="h1-title">Your Cart</h1>
+            <div class="grid-cart"> <!--holds all cart items-->
+                <div class="grid-cart-item"> <!--individual cart item, should be created each time add an item-->
+                    <img class="item-img"src="../images/AF1.jpeg" alt="Product Image">
+                    <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
+                        <div class="grid-item-info"> 
+                            <div class="item-title">Product Title super super super super super super lon</div>
+                            <div class="item-store">Product's Store's Name</div>
+                            <div>link</div>
+                            <img src="../images/trash-can1.png" alt="trash can">
+                        </div>
+                        <div class="item-info-price">Price</div>
+                    </div>
+                </div>
+                
+            </div>
+        </main>
     </body>
     <script src="popup.js"></script>
 </html>

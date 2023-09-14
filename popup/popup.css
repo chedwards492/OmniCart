@@ -1,9 +1,71 @@
-.box1 {
-    display: flex;
-    width: 300px;
-    background-color: red;
+.main {
+    display: grid; /* so that we can have a separate items list and then a summary single column */
+    background-color: brown;
+    font-family: 'Inter', sans-serif;
+    margin: 6em 23em;
+    padding: 1.5em;
 }
 
-.box1 h1 {
-    color: blue;
+.h1-title {
+    background-color: lightcoral;
+    width: 5em;
+    padding: .5em;
+    text-align: center;
+    vertical-align: top;
+}
+
+.grid-cart {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 44em;
+
+    background-color: aquamarine;
+}
+
+.grid-cart-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-bottom: 1.5em;
+}
+
+.item-img {
+    padding-left: 1.5em;
+    vertical-align: top;
+}
+
+.grid-item-info-price {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    background-color: red;
+
+    width: 32em;
+    padding-top: 0.5em;
+}
+
+.grid-item-info {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    gap: 0.5em;
+}
+
+.item-title {
+    font-size: 20px;
+    font-family: 'Inter', sans-serif;
+    color: aqua;
+
+    height: 1fr;
+}
+
+.item-store {
+    font-size: 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+.item-info-price {
+    padding-left: 1em;
+}
+
+.grid-item-info img {
+    height: 2em;
+    width: 2em;
 }
