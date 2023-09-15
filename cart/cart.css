@@ -1,0 +1,115 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+.h1-title {
+    width: 10rem;
+    border: 4px red solid;
+
+
+}
+
+.main {
+    border: 4px red solid;
+    
+    margin: min(2rem, 3%);
+    margin-top: 7%;
+
+    font-family: 'Inter', sans-serif;
+
+    margin-inline: auto;
+
+}
+
+.grid-container {
+    display: grid;
+    
+}
+
+
+.grid-cart {
+    display: grid;
+    
+    border: 2px blue solid;
+    
+}
+
+.grid-cart-item {
+    display: grid;
+    grid-template-columns: 2fr 5fr;
+}
+
+.grid-cart-item img {
+    vertical-align: top;
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
+    
+    /* set up widths, kinda messy but whatever, maybe replace with clamps*/
+    max-width: 9.5rem;
+    max-height: 9.5rem;
+    width: 90%;
+    height: 90%;
+    min-width: 3rem;
+    min-height: 3rem;
+
+    /* width: clamp(9.5rem, 60%, 3rem);
+    height: clamp(9.5rem, 60%, 3rem); */
+    border: 2px green solid;
+}
+
+
+.summary {
+    display: none;
+}
+
+@media (min-width: 58rem) {
+    .main {
+        border: 4px red solid;
+        
+        margin: min(2rem, 3%);
+        margin-top: 7%;
+    
+        font-family: 'Inter', sans-serif;
+    
+        margin-inline: auto;
+        
+        
+        width: min(64rem, 96%); /* feels about right 64 when screen's big, 96 when it's smaller and starts to encroach,
+                                    64 is the max-width*/
+    
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: 5fr 2fr;    
+    }
+
+    .grid-cart-item img {
+        vertical-align: top;
+        margin-inline: auto;
+        margin-top: 0.5rem;
+        max-width: 90%;
+        max-height: 90%;
+        /* min dimensions so you can see image if screen gets super small*/
+        min-width: 5rem;
+        min-height: 5rem;
+        border: 2px pink solid;
+    }
+
+    .grid-item-info-price {
+        display: grid;
+        grid-template-rows: 2fr 1.5fr 1fr 1fr;
+    }
+
+    /* summary at the bottom disappears when window gets big */
+    .summary-bottom {
+        display: none;
+    }
+
+    /* make summary reappear with display: block */
+    .summary {
+        display: block;
+    }
+}

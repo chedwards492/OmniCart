@@ -11,36 +11,24 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet">
     </head>
     <body style="background-color: #FFFBEA;">
+        
         <main class="main">
             <h1 class="h1-title">Your Cart</h1>
-            <div class="grid-cart"> <!--holds all cart items-->
-                <div class="grid-cart-item"> <!--individual cart item, should be created each time add an item-->
-                    <img class="item-img" src="../images/trash-can1.png" alt="Product Image">
-                    <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
-                        <div class="grid-item-info"> 
-                            <div class="item-title">Product Title stuff stuff stuff stuff stuf suff stuff stuff stuf sef se fs ef s efs ef a esf a ef ase f ase fa sef ase f asef ase fas ef asef sa fe sf asef</div>
-                            <div class="item-store">Product's Store's Name</div>
-                            <div>link</div>
-                            <img src="../images/trash-can1.png" alt="trash can">
+            <div class="grid-container"> <!--holds item img, info, and the summary, only used at big screen-->
+                <div class="grid-cart"> <!--holds all cart items-->
+                    <div class="grid-cart-item"> <!--individual cart item, should be created each time add an item-->
+                        <img src="../images/trash-can1.png" alt="Product Image">
+                        <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
+                            <div class="grid-item-info"> 
+                            </div>
+                            <div class="item-info-price"></div>
                         </div>
-                        <div class="item-info-price">$199.99</div>
                     </div>
                 </div>
-
-                <div class="grid-cart-item"> <!--individual cart item, should be created each time add an item-->
-                    <img class="item-img" src="../images/trash-can1.png" alt="Product Image">
-                    <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
-                        <div class="grid-item-info"> 
-                            <div class="item-title">Product Title</div>
-                            <div class="item-store">Product's Store's Name</div>
-                            <div>link</div>
-                            <img src="../images/trash-can1.png" alt="trash can">
-                        </div>
-                        <div class="item-info-price">$199.99</div>
-                    </div>
-                </div>
-                
+                <div class="summary">summary here</div>    
             </div>
+            <div class="summary-bottom">summary that shows up when small</div>
+            
         </main>
     </body>
     <script src="cart.js"></script>
