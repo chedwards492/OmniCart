@@ -11,20 +11,22 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;700;800&display=swap" rel="stylesheet">
     </head>
     <body style="background-color: #FFFBEA;">
-        
-        <main class="main">
+        <header>
             <h1 class="h1-title">Your Cart</h1>
+        </header>
+        <main class="main">
+            
             <div class="grid-container"> <!--holds item img, info, and the summary, only used at big screen-->
                 <div class="grid-cart"> <!--holds all cart items-->
                     <div class="grid-cart-item"> <!--individual cart item, should be created each time add an item-->
-                        <img src="../images/trash-can1.png" alt="Product Image">
+                        <a href="https://www.google.com" target="_blank"><img src="../images/trash-can1.png" alt="Product Image" class="item-img"></a>    
                         <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
                             <div class="grid-item-info">
-                                <a href="www.google.com" class="item-title">Product title</a>
+                                <a href="https://www.google.com" target="_blank" class="item-title">somethi sf sae fs efsa efs efshiuofcsheiufh siuf hsaef uhseuf shef ush fuhasuef hsau efhsu efhus hfu sefa sefh ashef ehsae fsh efn somethin</a>
                                 <div class="item-store">product store</div>
                                 <div class="grid-delete-copy">
                                     <button class="delete-button"></button>
-                                    <button class="copy-link-btn">Copy link</button>
+                                    <button class="copy-link-btn" onclick="copyLink(this)">Copy link</button>
                                 </div>
                             </div>
                             <div class="item-info-price">$100.00</div>
@@ -32,27 +34,42 @@
                     </div>
                     <span class="border"></span>
                     <div class="grid-cart-item"> <!--individual cart item, should be created each time add an item-->
-                        <img src="../images/trash-can1.png" alt="Product Image">
+                        <a href="https://www.google.com" target="_blank"><img src="../images/trash-can1.png" alt="Product Image" class="item-img"></a>    
                         <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
                             <div class="grid-item-info">
-                                <a href="www.google.com" class="item-title">Product title</a>
+                                <a href="https://www.google.com" target="_blank" class="item-title">somethin somethin</a>
                                 <div class="item-store">product store</div>
                                 <div class="grid-delete-copy">
                                     <button class="delete-button"></button>
-                                    <button class="copy-link-btn">Copy link</button>
+                                    <button class="copy-link-btn" onclick="copyLink(this)">Copy link</button>
                                 </div>
-                                
                             </div>
                             <div class="item-info-price">$100.00</div>
                         </div>
                     </div>
+                    <span class="border"></span>
+                    <div class="grid-cart-item"> <!--individual cart item, should be created each time add an item-->
+                        <a href="https://www.google.com" target="_blank"><img src="../images/trash-can1.png" alt="Product Image" class="item-img"></a>    
+                        <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
+                            <div class="grid-item-info">
+                                <a href="https://www.google.com" target="_blank" class="item-title">somethin somethin</a>
+                                <div class="item-store">product store</div>
+                                <div class="grid-delete-copy">
+                                    <button class="delete-button"></button>
+                                    <button class="copy-link-btn" onclick="copyLink(this)">Copy link</button>
+                                </div>
+                            </div>
+                            <div class="item-info-price">$100.00</div>
+                        </div>
+                    </div>
+                    <span class="border"></span>
                 </div>
                 <div class="summary-container">
                     <div class="summary">Your Summary</div>
-
+                    <div class="num-items">Number of Items: </div>
+                    <div class="sum-total">Total: </div>
                 </div>    
             </div>
-            <div class="summary-bottom">summary that shows up when small</div>
             
         </main>
     </body>

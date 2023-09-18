@@ -8,15 +8,30 @@ to two lines if there are two, but otherwise the store should look closer */
 	box-sizing: border-box;
 }
 
+body {
+    margin: 0px;
+}
+
+header {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    background-color: #FFE6E6;
+
+    height: 14rem;
+}
+
+
 .h1-title {
     width: 10rem;
-    border: 4px red solid;
     font-weight: 800;
+
+    margin-top: 0rem;
+    margin-inline: auto;
+
+    padding-top: 9rem;
 }
 
 .main {
-    border: 4px red solid;
-    
     margin: min(2rem, 3%);
     margin-top: 7%;
 
@@ -36,7 +51,7 @@ to two lines if there are two, but otherwise the store should look closer */
     display: grid;
     
     margin-top: 3rem;
-    border: 2px blue solid;
+    /* border: 2px blue solid; */
     gap: 1.5rem;
 }
 
@@ -54,7 +69,7 @@ to two lines if there are two, but otherwise the store should look closer */
     background: rgb(178, 178, 178);
 }
 
-.grid-cart-item img {
+.item-img {
     vertical-align: top;
     object-fit: contain;
 
@@ -69,7 +84,6 @@ to two lines if there are two, but otherwise the store should look closer */
 
     /* width: clamp(9.5rem, 60%, 3rem);
     height: clamp(9.5rem, 60%, 3rem); */
-    border: 2px green solid;
 }
 
 .grid-item-info-price {
@@ -155,23 +169,72 @@ to two lines if there are two, but otherwise the store should look closer */
 
 
 .summary-container {
-    width: 100%;
-    border: 2px purple solid;
+    max-width: 100%;
+
+    background-color: #FFE6E6;
+    border-radius: 1rem;
+    margin-top: 1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+
+    padding-bottom: 1rem;
 }
 
-.summary {
+.summary {    
     font-weight: 400;
     font-size: 1.6rem;
-    text-align: center;
+    text-align: left;
+
+    padding-top: 1rem;
+    padding-left: 1rem;
+
+}
+
+.num-items {
+    padding-top: 1.5rem;
+    padding-left: 1rem;
     
+    font-size: 1rem;
+}
+
+.sum-total {
+    padding-top: 0.8rem;
+    padding-left: 1rem;
+    padding-bottom: 0.5rem;
 }
 
 @media (min-width: 58rem) {
+
+    body {
+        margin: 0px;
+    }
+
+    header {
+        font-family: 'Inter', sans-serif;
+        font-weight: 800;
+        background-color: #FFE6E6;
+
+        height: 14rem;
+    }
+
+    .h1-title {
+        width: 10rem;
+        font-weight: 800;
+        line-height: 75%;
+    
+
+
+        margin-top: 0rem;
+        margin-left: 28rem;
+
+        padding-top: 10rem;
+        
+    }
+
     .main {
-        border: 4px red solid;
         
         margin: min(2rem, 3%);
-        margin-top: 6%;
+        margin-top: 0.5rem;
     
         font-family: 'Inter', sans-serif;
     
@@ -203,7 +266,7 @@ to two lines if there are two, but otherwise the store should look closer */
 
     }
 
-    .grid-cart-item img {
+    .item-img {
         vertical-align: top;
         margin-inline: auto;
         margin-top: 0.5rem;
@@ -212,7 +275,6 @@ to two lines if there are two, but otherwise the store should look closer */
         /* min dimensions so you can see image if screen gets super small*/
         min-width: 5rem;
         min-height: 5rem;
-        border: 2px pink solid;
     }
 
     .grid-item-info-price {
@@ -263,14 +325,30 @@ to two lines if there are two, but otherwise the store should look closer */
         margin-bottom: 0.1rem;
     }
 
-
-    /* summary at the bottom disappears when window gets big */
-    .summary-bottom {
-        display: none;
+    .summary-container {
+        width: 100%;
+    
+        background-color: #FFE6E6;
+        border-radius: 1rem;
+        margin-top: 1rem;
+        margin-left: 1rem;
     }
 
-    /* make summary reappear with display: block */
     .summary {
         display: block;
+        padding-top: 1.5rem;
+        padding-left: 1.5rem;
+    }
+
+    .num-items {
+        padding-top: 1.5rem;
+        padding-left: 1.5rem;
+        
+        font-size: 1rem;
+    }
+
+    .sum-total {
+        padding-top: 0.8rem;
+        padding-left: 1.5rem;
     }
 }
