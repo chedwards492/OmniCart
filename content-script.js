@@ -12,11 +12,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log(message.po);
         //sendResponse({ response: document }); not sure if works or necessary
     }
+
+    guessTitle();
     return true;
 });
 
 function test() {
     //console.log("wtf going on");
+    console.log("test() ran");
 }
 
 /* Here begins the process of trying to create spew logic and conditional statements "smart" enough to 
@@ -36,11 +39,11 @@ const H1 = "h1";
 const H2 = "h2";
 const H3 = "h3";
 
-/*
+/* RUNS BUT HAS PROBLEMS, contains will call error b/c often the className and/or id is null, so gotta check for that before the 
+    conditionals involving className and id */
+
 function guessTitle() {
-    console.log("guessTitle ran");
-    return "bloop";
-    /*
+
     // var str = "No Title Found";
     // return str;
     // array with all textnodes
@@ -50,10 +53,9 @@ function guessTitle() {
     for (let i = 0; i < tNodes.length; i++) {
         let currNode = tNodes[i];
         if (tNodes[i].className == null) {
-            
-        }
-        // 1
-        if ( ( ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(TITLE)) ||
+            break;
+        } else {
+            if ( ( ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(TITLE)) ||
             (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(NAME)) ||
             (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
             (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) ) ||
@@ -69,54 +71,54 @@ function guessTitle() {
             ) {
             return tNodes[i];
         // 2
-        } else if ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) || 
-                (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
-                (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(NAME)) || 
-                (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(TITLE)) ) {
-            return tNodes[i];
-        // 3
-        } else if ( ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(TITLE)) ||
-        (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(NAME)) ||
-        (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
-        (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) ) ||
+            } else if ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) || 
+                    (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
+                    (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(NAME)) || 
+                    (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(TITLE)) ) {
+                return tNodes[i];
+            // 3
+            } else if ( ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(TITLE)) ||
+                (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(NAME)) ||
+                (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
+                (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) ) ||
 
-        ( (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(TITLE)) ||
-        (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(NAME)) ||
-        (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(TITLE)) ||
-        (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(NAME)) ) ) {
-            return tNodes[i];
-        }
-        // else get all nodes, find something with p & i & t... and take first text node you find
-        else {
-            for (let j = 0; j < allNodes.length; j++) {
-                let currNode2 = allNodes[j];
-
-                if ( (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(NAME)) || 
-                (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(TITLE)) ||
-                (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(NAME)) || 
-                (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(TITLE)) ) {
-                    let potNodes = textNodesUnder(allNodes[j]);
-                    return potNodes[0];
-
-                } else if ( ( (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(TITLE)) ||
-                (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(NAME)) ||
-                (allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(TITLE)) ||
-                (allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(NAME)) ) ||
-        
-                ( (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(TITLE)) ||
-                (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(NAME)) ||
-                (allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(TITLE)) ||
-                (allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(NAME)) ) ) {
-                    let potNodes = textNodesUnder(allNodes[j]);
-                    return potNodes[0];
-
-                }
+                ( (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(TITLE)) ||
+                (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(NAME)) ||
+                (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(TITLE)) ||
+                (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(NAME)) ) ) {
+                    return tNodes[i];
             }
         }
-    }
+        // else get all nodes, find something with p & i & t... and take first text node you find
+        for (let j = 0; j < allNodes.length; j++) {
+            let currNode2 = allNodes[j];
+
+            if ( (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(NAME)) || 
+            (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(TITLE)) ||
+            (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(NAME)) || 
+            (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(TITLE)) ) {
+                let potNodes = textNodesUnder(allNodes[j]);
+                return potNodes[0];
+
+            } else if ( ( (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(TITLE)) ||
+            (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(NAME)) ||
+            (allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(TITLE)) ||
+            (allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(NAME)) ) ||
+    
+            ( (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(TITLE)) ||
+            (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(NAME)) ||
+            (allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(TITLE)) ||
+            (allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(NAME)) ) ) {
+                let potNodes = textNodesUnder(allNodes[j]);
+                return potNodes[0];
+
+            }
+        }
+    }    
+
     let str = "No Title Found";
-    return "No Title Found.";
-}*/
+    return str;
+}
 
 
 function textNodesUnder(el) {

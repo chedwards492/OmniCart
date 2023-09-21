@@ -6,7 +6,6 @@ let document;
 chrome.commands.onCommand.addListener((command) => {
     console.log("activated command");
     chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-        guessTitle();
         // send the tab's url to popup.js so it can put it in the popup
         chrome.runtime.sendMessage({ message: "get-tab-url", url: tabs[0].url });
 
@@ -19,13 +18,13 @@ chrome.commands.onCommand.addListener((command) => {
         */
         
         // send message to content script to collect data from page - SUCCESSFUL
-        chrome.tabs.sendMessage(tabs[0].id, { message: "get-item-info", po: "waddup"});
+        chrome.tabs.sendMessage(tabs[0].id, { message: "get-item-info", po: "message sent from service worker to content"});
 
     });
 });
 
 
-function guessTitle() {
-    console.log("guessTitle ran in service worker");
-    return "yuP";
-}
+// function guessTitle() {
+//     console.log("guessTitle ran in service worker");
+//     return "yuP";
+// }
