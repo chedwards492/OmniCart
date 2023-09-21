@@ -12,8 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
 chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
     if (message.message == "get-tab-url") {
         console.log("received message!!! curr tab's url: " + message.url);
-        setBadgeElement.textContent = message.url;
+        //setBadgeElement.textContent = message.url;
     }
-    
 });
 

@@ -1,13 +1,25 @@
+
+
 document.addEventListener("click", () => {
     console.log("clicked content script!!");
 
 
 });
 
-/*STOPPPPPP WAIIIIIIT CUZ there's a chance we won't be able to access the HTML b/c there is probably js on the page
-so might have to scrape with python or something similar so not worth writing out the logic in js rn*/ 
+/* Receive message from service worker to collect item data - S */
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { 
+    if (message.message == "get-item-info") {
+        console.log(message.po);
+        //sendResponse({ response: document }); not sure if works or necessary
+    }
+    return true;
+});
 
-/* Here begins the process of trying to create a spew logic and conditional statements "smart" enough to 
+function test() {
+    //console.log("wtf going on");
+}
+
+/* Here begins the process of trying to create spew logic and conditional statements "smart" enough to 
     distinguish a product title, image, and price from other text on a page. Program this last b/c it's not
     stupid important, just need some general logic. Hopefully will not have to deal with js on pages as we'll be
     working in the actual product's page, not like a page with a bunch of products on it. Want Product title, image 
@@ -16,37 +28,109 @@ so might have to scrape with python or something similar so not worth writing ou
 
 /* Try to find a potential Product Title */
 
-// first collect all h1's and try those
-let h1s = document.getElementsByTagName("h1"); // an HTMLCollection, can't use push() pop() join() but like an array in every other way
-// iterate over h1s
-for (let i = 0; i < h1s.length; i++) {
-    let currh1 = h1s[i];
+const PROD = "product";
+const ITEM = "item";
+const NAME = "name";
+const TITLE = "title";
+const H1 = "h1";
+const H2 = "h2";
+const H3 = "h3";
 
-    // the first and most definitive conditions, if it's h1 and has product/item and title/name in it's class or id
-    if ( ((currh1.className.includes("product") || currh1.className.includes("item"))
-        || (currh1.id.includes("product") || currh1.id.includes("item")))
-        && ((currh1.className.includes("title") || currh1.className.includes("name")) 
-        || (currh1.id.includes("title") || currh1.id.includes("name")))) {
-        // save the text of it in maybe an array of potential elements
-    }
-    else if (currh1.className.includes("product") || currh1.className.includes("item") 
-        || currh1.className.includes("name") || currh1.className.includes("title")
-        || currh1.id.includes("product") || currh1.id.includes("item") 
-        || currh1.id.includes("name") || currh1.id.includes("title") ) {
-
+/*
+function guessTitle() {
+    console.log("guessTitle ran");
+    return "bloop";
+    /*
+    // var str = "No Title Found";
+    // return str;
+    // array with all textnodes
+    let tNodes = textNodesUnder(document.querySelector("body"));
+    let allNodes = document.querySelector("body").getElementsByTagName("*");
+    // iterate over tNodes
+    for (let i = 0; i < tNodes.length; i++) {
+        let currNode = tNodes[i];
+        if (tNodes[i].className == null) {
+            
         }
+        // 1
+        if ( ( ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(TITLE)) ||
+            (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(NAME)) ||
+            (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
+            (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) ) ||
 
-    
-    
+            ( (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(TITLE)) ||
+            (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(NAME)) ||
+            (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(TITLE)) ||
+            (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(NAME)) ) ) &&
+
+            ( tNodes[i].tagName.toLowerCase() == H1 || 
+            tNodes[i].tagName.toLowerCase() == H1 || 
+            tNodes[i].tagName.toLowerCase() == H1 )
+            ) {
+            return tNodes[i];
+        // 2
+        } else if ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) || 
+                (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
+                (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(NAME)) || 
+                (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(TITLE)) ) {
+            return tNodes[i];
+        // 3
+        } else if ( ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(TITLE)) ||
+        (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(NAME)) ||
+        (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
+        (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) ) ||
+
+        ( (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(TITLE)) ||
+        (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(NAME)) ||
+        (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(TITLE)) ||
+        (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(NAME)) ) ) {
+            return tNodes[i];
+        }
+        // else get all nodes, find something with p & i & t... and take first text node you find
+        else {
+            for (let j = 0; j < allNodes.length; j++) {
+                let currNode2 = allNodes[j];
+
+                if ( (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(NAME)) || 
+                (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(TITLE)) ||
+                (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(NAME)) || 
+                (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(TITLE)) ) {
+                    let potNodes = textNodesUnder(allNodes[j]);
+                    return potNodes[0];
+
+                } else if ( ( (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(TITLE)) ||
+                (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(NAME)) ||
+                (allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(TITLE)) ||
+                (allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(NAME)) ) ||
+        
+                ( (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(TITLE)) ||
+                (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(NAME)) ||
+                (allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(TITLE)) ||
+                (allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(NAME)) ) ) {
+                    let potNodes = textNodesUnder(allNodes[j]);
+                    return potNodes[0];
+
+                }
+            }
+        }
+    }
+    let str = "No Title Found";
+    return "No Title Found.";
+}*/
+
+
+function textNodesUnder(el) {
+    let n, a = [], walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    while(n=walk.nextNode()) a.push(n);
+    return a;
 }
 
 
 /*
-For Product Name:
-h1 element or some close descendant of an h1 element
-"product" || "item" && "name" || "title"
-
-
 For Product Image:
 usually has alt attribute with a string that contains the product's title
 */
+
+
+/* https://stackoverflow.com/questions/13917047/how-to-get-a-content-script-to-load-after-a-pages-javascript-has-executed
+to wait for js to load */ 
