@@ -13,7 +13,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         //sendResponse({ response: document }); not sure if works or necessary
     }
 
-    guessTitle();
+    let x = guessTitle();
+    console.log("guessTitle() return: " + x);
     return true;
 });
 
@@ -35,87 +36,110 @@ const PROD = "product";
 const ITEM = "item";
 const NAME = "name";
 const TITLE = "title";
-const H1 = "h1";
-const H2 = "h2";
-const H3 = "h3";
+const H1 = "H1";
+const H2 = "H2";
+const H3 = "H3";
 
-/* RUNS BUT HAS PROBLEMS, contains will call error b/c often the className and/or id is null, so gotta check for that before the 
-    conditionals involving className and id */
+/* PROBLEM IS that textnodes don't have classes, tagnames, etc. I think
+so maybe need a diff way to get all elements with some text */
 
 function guessTitle() {
 
-    // var str = "No Title Found";
-    // return str;
-    // array with all textnodes
+    
     let tNodes = textNodesUnder(document.querySelector("body"));
     let allNodes = document.querySelector("body").getElementsByTagName("*");
+    let x = 0;
+    console.log
     // iterate over tNodes
-    for (let i = 0; i < tNodes.length; i++) {
+    for (let i = 0; i < 50 /*tNodes.length*/; i++) {
         let currNode = tNodes[i];
-        if (tNodes[i].className == null) {
-            break;
-        } else {
-            if ( ( ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(TITLE)) ||
-            (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(NAME)) ||
-            (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
-            (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) ) ||
+        console.log("tagName: " + tNodes[i].tagName);
+        if (x==0) {
+            console.log("tNodes.length: " + tNodes.length);
+            x=1;
+        }
 
-            ( (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(TITLE)) ||
-            (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(NAME)) ||
-            (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(TITLE)) ||
-            (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(NAME)) ) ) &&
+        // if (tNodes[i].tagName == "H1") {
+        //     return "FOUND H1: " + tNodes[i];
+        // }
+        
+    // 1
+        if ( ( ( (tNodes[i].className != null) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
+        (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(NAME)) ||
+        (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ||
+        (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) ) ) ||
 
-            ( tNodes[i].tagName.toLowerCase() == H1 || 
-            tNodes[i].tagName.toLowerCase() == H1 || 
-            tNodes[i].tagName.toLowerCase() == H1 )
-            ) {
+        ((tNodes[i].id != null) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
+        (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(NAME)) ||
+        (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ||
+        (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) ) ) ) &&
+
+        ( tNodes[i].tagName.toLowerCase() == H1 || 
+        tNodes[i].tagName.toLowerCase() == H2 || 
+        tNodes[i].tagName.toLowerCase() == H3 )) 
+        {
+        return tNodes[i];
+    // 2
+        } else if ( ( (tNodes[i].className != null ) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) || 
+                (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ) ) ||
+                ( (tNodes[i].id != null) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) || 
+                (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ) ) ) {
             return tNodes[i];
-        // 2
-            } else if ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) || 
-                    (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
-                    (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(NAME)) || 
-                    (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(TITLE)) ) {
+        // added, two keywords & h1,h2,h3
+        } else if ( ( ( (tNodes[i].className != null) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
+                (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(NAME)) ||
+                (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ||
+                (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) ) ) ||
+
+                ( (tNodes[i].id != null) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
+                (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(NAME)) ||
+                (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ||
+                (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) ) ) ) &&
+
+                ( tNodes[i].tagName == H1 || 
+                tNodes[i].tagName == H2 || 
+                tNodes[i].tagName == H3 ) ) { 
                 return tNodes[i];
-            // 3
-            } else if ( ( (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(TITLE)) ||
-                (tNodes[i].className.contains(PROD) && tNodes[i].className.contains(NAME)) ||
-                (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(TITLE)) ||
-                (tNodes[i].className.contains(ITEM) && tNodes[i].className.contains(NAME)) ) ||
+        // 3
+        } else if ( ( (tNodes[i].className != null) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
+                (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(NAME)) ||
+                (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ||
+                (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) ) ) ||
 
-                ( (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(TITLE)) ||
-                (tNodes[i].id.contains(PROD) && tNodes[i].id.contains(NAME)) ||
-                (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(TITLE)) ||
-                (tNodes[i].id.contains(ITEM) && tNodes[i].id.contains(NAME)) ) ) {
-                    return tNodes[i];
-            }
+                ( (tNodes[i].id != null) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
+                (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(NAME)) ||
+                (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ||
+                (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) ) ) ) {
+            return tNodes[i];
         }
+    }
         // else get all nodes, find something with p & i & t... and take first text node you find
-        for (let j = 0; j < allNodes.length; j++) {
-            let currNode2 = allNodes[j];
+    /*for (let j = 0; j < allNodes.length; j++) {
+        let currNode2 = allNodes[j];
 
-            if ( (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(NAME)) || 
-            (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(TITLE)) ||
-            (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(NAME)) || 
-            (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(TITLE)) ) {
-                let potNodes = textNodesUnder(allNodes[j]);
+        if ( ( (allNodes[j].className != null) && 
+        ( (allNodes[j].className.includes(PROD) && allNodes[j].className.includes(ITEM) && allNodes[j].className.includes(NAME)) || 
+        (allNodes[j].className.includes(PROD) && allNodes[j].className.includes(ITEM) && allNodes[j].className.includes(TITLE)) ) ) ||
+        ( (allNodes[j].id != null) && ( (allNodes[j].id.includes(PROD) && allNodes[j].id.includes(ITEM) && allNodes[j].id.includes(NAME)) || 
+        (allNodes[j].id.includes(PROD) && allNodes[j].id.includes(ITEM) && allNodes[j].id.includes(TITLE)) ) ) ) {
+            let potNodes = textNodesUnder(allNodes[j]);
+            if (potNodes[0] != null) {
                 return potNodes[0];
-
-            } else if ( ( (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(TITLE)) ||
-            (allNodes[j].className.contains(PROD) && allNodes[j].className.contains(NAME)) ||
-            (allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(TITLE)) ||
-            (allNodes[j].className.contains(ITEM) && allNodes[j].className.contains(NAME)) ) ||
-    
-            ( (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(TITLE)) ||
-            (allNodes[j].id.contains(PROD) && allNodes[j].id.contains(NAME)) ||
-            (allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(TITLE)) ||
-            (allNodes[j].id.contains(ITEM) && allNodes[j].id.contains(NAME)) ) ) {
-                let potNodes = textNodesUnder(allNodes[j]);
-                return potNodes[0];
-
             }
-        }
-    }    
+            break;
+        } else if ( ( (allNodes[j].className != null) && ( (allNodes[j].className.includes(PROD) && allNodes[j].className.includes(TITLE)) ||
+        (allNodes[j].className.includes(PROD) && allNodes[j].className.includes(NAME)) ||
+        (allNodes[j].className.includes(ITEM) && allNodes[j].className.includes(TITLE)) ||
+        (allNodes[j].className.includes(ITEM) && allNodes[j].className.includes(NAME)) ) ) ||
 
+        ( (allNodes[j].id != null) && ( (allNodes[j].id.includes(PROD) && allNodes[j].id.includes(TITLE)) ||
+        (allNodes[j].id.includes(PROD) && allNodes[j].id.includes(NAME)) ||
+        (allNodes[j].id.includes(ITEM) && allNodes[j].id.includes(TITLE)) ||
+        (allNodes[j].id.includes(ITEM) && allNodes[j].id.includes(NAME)) ) ) ) {
+            let potNodes = textNodesUnder(allNodes[j]);
+            return potNodes[0];
+        }
+    }*/
     let str = "No Title Found";
     return str;
 }
@@ -130,7 +154,7 @@ function textNodesUnder(el) {
 
 /*
 For Product Image:
-usually has alt attribute with a string that contains the product's title
+usually has alt attribute with a string that includes the product's title
 */
 
 
