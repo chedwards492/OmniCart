@@ -46,30 +46,34 @@ so maybe need a diff way to get all elements with some text */
 function guessTitle() {
 
     
-    let tNodes = textNodesUnder(document.querySelector("body"));
+    // let tNodes = textNodesUnder(document.querySelector("body"));
+    let tNodes = []; 
     let allNodes = document.querySelector("body").getElementsByTagName("*");
     let x = 0;
-    console.log
-    // iterate over tNodes
-    for (let i = 0; i < 50 /*tNodes.length*/; i++) {
-        let currNode = tNodes[i];
-        console.log("tagName: " + tNodes[i].tagName);
+
+    // get all nodes, then get just the nodes that have direct text in them
+    let aNodes = document.getElementsByTagName("*");
+    for (let k = 0; k < aNodes.length; k++) {
+        if (containsDirectText(aNodes[k])) {
+            tNodes.push(aNodes[k]);
+        }
+    }
+
+
+    // iterate over tNodes - this needs to be changed so that it iterates three different times, each time loosening the requirements for a potential title
+    for (let i = 0; i < tNodes.length; i++) {
         if (x==0) {
             console.log("tNodes.length: " + tNodes.length);
             x=1;
         }
-
-        // if (tNodes[i].tagName == "H1") {
-        //     return "FOUND H1: " + tNodes[i];
-        // }
         
     // 1
-        if ( ( ( (tNodes[i].className != null) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
+        if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
         (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(NAME)) ||
         (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ||
         (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) ) ) ||
 
-        ((tNodes[i].id != null) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
+        ((tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
         (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(NAME)) ||
         (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ||
         (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) ) ) ) &&
@@ -78,20 +82,27 @@ function guessTitle() {
         tNodes[i].tagName.toLowerCase() == H2 || 
         tNodes[i].tagName.toLowerCase() == H3 )) 
         {
-        return tNodes[i];
+            console.log("1");
+            return tNodes[i];
+        }
+    }
     // 2
-        } else if ( ( (tNodes[i].className != null ) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) || 
+    for (let i = 0; i < tNodes.length; i++) {
+        if ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string") ) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) || 
                 (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ) ) ||
-                ( (tNodes[i].id != null) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) || 
+                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) || 
                 (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ) ) ) {
             return tNodes[i];
-        // added, two keywords & h1,h2,h3
-        } else if ( ( ( (tNodes[i].className != null) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
+        }
+    }
+    // added
+    for (let i = 0; i < tNodes.length; i++) {
+        if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
                 (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(NAME)) ||
                 (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ||
                 (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) ) ) ||
 
-                ( (tNodes[i].id != null) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
+                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
                 (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(NAME)) ||
                 (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ||
                 (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) ) ) ) &&
@@ -99,20 +110,25 @@ function guessTitle() {
                 ( tNodes[i].tagName == H1 || 
                 tNodes[i].tagName == H2 || 
                 tNodes[i].tagName == H3 ) ) { 
-                return tNodes[i];
-        // 3
-        } else if ( ( (tNodes[i].className != null) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
+            console.log("2");
+            return tNodes[i].textContent;
+        }
+    }
+    // 3
+    for (let i = 0; i < tNodes.length; i++) {
+        if ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
                 (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(NAME)) ||
                 (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ||
                 (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) ) ) ||
 
-                ( (tNodes[i].id != null) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
+                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
                 (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(NAME)) ||
                 (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ||
                 (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) ) ) ) {
-            return tNodes[i];
+            return tNodes[i].textContent;
         }
     }
+
         // else get all nodes, find something with p & i & t... and take first text node you find
     /*for (let j = 0; j < allNodes.length; j++) {
         let currNode2 = allNodes[j];
@@ -143,6 +159,12 @@ function guessTitle() {
     let str = "No Title Found";
     return str;
 }
+
+function containsDirectText(el) {
+    return [...el.childNodes]
+        .some(n => n.nodeType === Node.TEXT_NODE
+              && n.nodeValue.trim() !== '');
+  }
 
 
 function textNodesUnder(el) {
