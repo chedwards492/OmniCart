@@ -43,8 +43,8 @@ const H1 = "H1";
 const H2 = "H2";
 const H3 = "H3";
 
-/* Need to include a second case where we look for tags like h1, h2, h3 that don't have direct text, but contain some text in them like 
-a span or something. ebay has a good example of this and why it's not working*/
+/* div or span class w p&n that contains a h1/h2/h3
+add term "brand" to all of the checks */
 
 function guessTitle() {
 
@@ -108,6 +108,33 @@ function guessTitle() {
             return tNodes[i].textContent;
         }
     }
+
+    // get all nodes, p&n + h1 || h2, 
+    let allNodes = document.getElementsByTagName("*");
+
+    for (let i = 0; i < allNodes.length; i++) {
+        if ( ( ( (allNodes[i].className != null && (typeof allNodes[i].className == "string")) && 
+            ( (allNodes[i].className.toLowerCase().includes(PROD) && allNodes[i].className.toLowerCase().includes(TITLE)) ||
+            (allNodes[i].className.toLowerCase().includes(PROD) && allNodes[i].className.toLowerCase().includes(NAME)) ||
+            (allNodes[i].className.toLowerCase().includes(ITEM) && allNodes[i].className.toLowerCase().includes(TITLE)) ||
+            (allNodes[i].className.toLowerCase().includes(ITEM) && allNodes[i].className.toLowerCase().includes(NAME)) ) ) ||
+
+            ( (allNodes[i].id != null && (typeof allNodes[i].id == "string")) && 
+            ( (allNodes[i].id.toLowerCase().includes(PROD) && allNodes[i].id.toLowerCase().includes(TITLE)) ||
+            (allNodes[i].id.toLowerCase().includes(PROD) && allNodes[i].id.toLowerCase().includes(NAME)) ||
+            (allNodes[i].id.toLowerCase().includes(ITEM) && allNodes[i].id.toLowerCase().includes(TITLE)) ||
+            (allNodes[i].id.toLowerCase().includes(ITEM) && allNodes[i].id.toLowerCase().includes(NAME)) ) ) ) &&
+
+            (allNodes[i].tagName == H1 || 
+            allNodes[i].tagName == H2) ) {
+
+            if (allNodes[i].textContent != null) {
+                return allNodes[i].textContent;
+            }
+        }
+    }
+
+
     // added to separate above h1's and h2's from h3's
     for (let i = 0; i < tNodes.length; i++) {
         if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
@@ -120,19 +147,45 @@ function guessTitle() {
                 (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
                 (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) ) ) ) &&
 
-                (tNodes[i].tagName == H3 ) ) { 
+                (tNodes[i].tagName == H3 ) ) {
             console.log("added");
             return tNodes[i].textContent;
         }
     }
+
+    // all nodes, p&t + h3
+    for (let i = 0; i < allNodes.length; i++) {
+        if ( ( ( (allNodes[i].className != null && (typeof allNodes[i].className == "string")) && 
+            ( (allNodes[i].className.toLowerCase().includes(PROD) && allNodes[i].className.toLowerCase().includes(TITLE)) ||
+            (allNodes[i].className.toLowerCase().includes(PROD) && allNodes[i].className.toLowerCase().includes(NAME)) ||
+            (allNodes[i].className.toLowerCase().includes(ITEM) && allNodes[i].className.toLowerCase().includes(TITLE)) ||
+            (allNodes[i].className.toLowerCase().includes(ITEM) && allNodes[i].className.toLowerCase().includes(NAME)) ) ) ||
+
+            ( (allNodes[i].id != null && (typeof allNodes[i].id == "string")) && 
+            ( (allNodes[i].id.toLowerCase().includes(PROD) && allNodes[i].id.toLowerCase().includes(TITLE)) ||
+            (allNodes[i].id.toLowerCase().includes(PROD) && allNodes[i].id.toLowerCase().includes(NAME)) ||
+            (allNodes[i].id.toLowerCase().includes(ITEM) && allNodes[i].id.toLowerCase().includes(TITLE)) ||
+            (allNodes[i].id.toLowerCase().includes(ITEM) && allNodes[i].id.toLowerCase().includes(NAME)) ) ) ) &&
+
+            (allNodes[i].tagName == H1 || 
+            allNodes[i].tagName == H2) ) {
+
+            if (allNodes[i].textContent != null) {
+                return allNodes[i].textContent;
+            }
+        }
+    }
+
     // 3
     for (let i = 0; i < tNodes.length; i++) {
-        if ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
+        if ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && 
+            ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
                 (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(NAME)) ||
                 (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
                 (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(NAME)) ) ) ||
 
-                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
+                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && 
+                ( (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
                 (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(NAME)) ||
                 (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
                 (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) ) ) ) {
@@ -140,42 +193,20 @@ function guessTitle() {
             return tNodes[i].textContent;
         }
     }
+    
+
+    
+
     // last resort - just get first h1, h2, or h3 element you see, should go below allNodes look up
-    for (let i = 0; i < tNodes.length; i++) {
-        if (tNodes[i].tagName == H1 || tNodes[i].tagName == H2 || tNodes[i].tagName == H3) {
-            console.log("last resort, h1, h2, or h3");
-            return tNodes[i].textContent;
+    for (let i = 0; i < allNodes.length; i++) {
+        if (allNodes[i].tagName == H1 || allNodes[i].tagName == H2 || allNodes[i].tagName == H3) {
+            if (allNodes[i].textContent != null) {
+                console.log("last resort, h1, h2, or h3");
+                return allNodes[i].textContent;
+            }
         }
     }
-/* Not sure if this bit is necessary, cuz I'm returning the text content of whatever element it finds, and that includes all the 
-    child nodes' text content as well. Table this though cuz I'd just be doing more exhaustive guessing, not worth it rn
 
-    let allNodes = document.querySelector("body").getElementsByTagName("*");
-
-    for (let j = 0; j < allNodes.length; j++) {
-        if ( ( (allNodes[j].className != null) && 
-        ( (allNodes[j].className.toLowerCase().includes(PROD) && allNodes[j].className.toLowerCase().includes(ITEM) && allNodes[j].className.toLowerCase().includes(NAME)) || 
-        (allNodes[j].className.toLowerCase().includes(PROD) && allNodes[j].className.toLowerCase().includes(ITEM) && allNodes[j].className.toLowerCase().includes(TITLE)) ) ) ||
-        ( (allNodes[j].id != null) && ( (allNodes[j].id.toLowerCase().includes(PROD) && allNodes[j].id.toLowerCase().includes(ITEM) && allNodes[j].id.toLowerCase().includes(NAME)) || 
-        (allNodes[j].id.toLowerCase().includes(PROD) && allNodes[j].id.toLowerCase().includes(ITEM) && allNodes[j].id.toLowerCase().includes(TITLE)) ) ) ) {
-            let potNodes = textNodesUnder(allNodes[j]);
-            if (potNodes[0] != null) {
-                return potNodes[0];
-            }
-            break;
-        } else if ( ( (allNodes[j].className != null) && ( (allNodes[j].className.toLowerCase().includes(PROD) && allNodes[j].className.toLowerCase().includes(TITLE)) ||
-        (allNodes[j].className.toLowerCase().includes(PROD) && allNodes[j].className.toLowerCase().includes(NAME)) ||
-        (allNodes[j].className.toLowerCase().includes(ITEM) && allNodes[j].className.toLowerCase().includes(TITLE)) ||
-        (allNodes[j].className.toLowerCase().includes(ITEM) && allNodes[j].className.toLowerCase().includes(NAME)) ) ) ||
-
-        ( (allNodes[j].id != null) && ( (allNodes[j].id.toLowerCase().includes(PROD) && allNodes[j].id.toLowerCase().includes(TITLE)) ||
-        (allNodes[j].id.toLowerCase().includes(PROD) && allNodes[j].id.toLowerCase().includes(NAME)) ||
-        (allNodes[j].id.toLowerCase().includes(ITEM) && allNodes[j].id.toLowerCase().includes(TITLE)) ||
-        (allNodes[j].id.toLowerCase().includes(ITEM) && allNodes[j].id.toLowerCase().includes(NAME)) ) ) ) {
-            let potNodes = textNodesUnder(allNodes[j]);
-            return potNodes[0];
-        }
-    }*/
     let str = "No Title Found";
     return str;
 }
@@ -198,9 +229,17 @@ function guessImage(name) {
     console.log(name.length);
     let imgs = document.getElementsByTagName("img");
 
-    // console.log("width: " + x.clientWidth + " height: " + x.clientHeight);
-    // console.log("width: " + x.naturalWidth + " height: " + x.naturalHeight);
     
+    for (let i = 0; i < imgs.length; i++) {
+        let img = imgs[i];
+        if (isVisible(img) && ((window.scrollY + img.getBoundingClientRect().top) < 400) &&
+            img.width > 400 && img.height > 400) {
+            console.log("found thrud dimensions: " + img.src);
+            return;
+        }
+    }
+
+    // 1 - use retrieved title and search in imgs' src or setsrc
     for (let i = 0; i < imgs.length; i++) {
         let img = imgs[i];
         if (isVisible(img)) {
@@ -217,15 +256,27 @@ function guessImage(name) {
             let str3 = name.substring((name.length)/2, ((name.length)*(3/4)));
             let str4 = name.substring(((name.length)*(3/4)), name.length);
             console.log(str1 + "  " + str2 + "  " + str3 + "  " + str4);
-            if (img.getAttribute("alt").includes(str1) || img.getAttribute("alt").includes(str2) || 
-                img.getAttribute("alt").includes(str3) || img.getAttribute("alt").includes(str4) ||
-                img.getAttribute("alt").includes("Picture 1 of 11")) {
-                console.log(str1 + "  " + str2 + "  " + str3 + "  " + str4);
-                console.log("FOUND IT: " + img.src);
+            if (img.getAttribute("srcset") != null) {
+                if (img.getAttribute("srcset").includes(str1) || img.getAttribute("srcset").includes(str2) || 
+                img.getAttribute("srcset").includes(str3) || img.getAttribute("srcset").includes(str4)) {
+                    console.log("found srcset img: " + img.src);
+                    return;
+                }
+            }
+            if (img.getAttribute("alt") != null) {
+                if (img.getAttribute("alt").includes(str1) || img.getAttribute("alt").includes(str2) || 
+                    img.getAttribute("alt").includes(str3) || img.getAttribute("alt").includes(str4)) {
+                    console.log("FOUND IT alt: " + img.src);
+                    return;
+                }
+            }
             
         }
-        }
     }
+
+    
+    console.log("no img found");
+    return "didn't find an image";
 }
 
 function isVisible(el) {
