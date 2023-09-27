@@ -13,8 +13,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         //sendResponse({ response: document }); not sure if works or necessary
     }
 
-    let x = guessTitle();
-    console.log("guessTitle() return: " + x);
+    let name = guessTitle();
+    console.log("guessTitle() return: " + name);
+
+    let y = guessImage(name);
+    console.log("guessImage() return: " + y);
     return true;
 });
 
@@ -40,118 +43,135 @@ const H1 = "H1";
 const H2 = "H2";
 const H3 = "H3";
 
-/* PROBLEM IS that textnodes don't have classes, tagnames, etc. I think
-so maybe need a diff way to get all elements with some text */
+/* Need to include a second case where we look for tags like h1, h2, h3 that don't have direct text, but contain some text in them like 
+a span or something. ebay has a good example of this and why it's not working*/
 
 function guessTitle() {
 
-    
-    // let tNodes = textNodesUnder(document.querySelector("body"));
-    let tNodes = []; 
-    let allNodes = document.querySelector("body").getElementsByTagName("*");
-    let x = 0;
-
     // get all nodes, then get just the nodes that have direct text in them
+    let potentialNodes = []; 
     let aNodes = document.getElementsByTagName("*");
     for (let k = 0; k < aNodes.length; k++) {
         if (containsDirectText(aNodes[k])) {
-            tNodes.push(aNodes[k]);
+            potentialNodes.push(aNodes[k]);
         }
     }
 
+    // only get visible elements from the potential tNodes
+    let tNodes = potentialNodes.filter(x => x.offsetWidth !== 0 || x.offsetHeight !== 0);
 
-    // iterate over tNodes - this needs to be changed so that it iterates three different times, each time loosening the requirements for a potential title
-    for (let i = 0; i < tNodes.length; i++) {
-        if (x==0) {
-            console.log("tNodes.length: " + tNodes.length);
-            x=1;
-        }
-        
+    for (let i = 0; i < tNodes.length; i++) {        
     // 1
-        if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
-        (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(NAME)) ||
-        (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ||
-        (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) ) ) ||
+        if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
+        (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(NAME)) ||
+        (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
+        (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(NAME)) ) ) ||
 
-        ((tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
-        (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(NAME)) ||
-        (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ||
-        (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) ) ) ) &&
+        ((tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
+        (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(NAME)) ||
+        (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
+        (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) ) ) ) &&
 
         ( tNodes[i].tagName.toLowerCase() == H1 || 
         tNodes[i].tagName.toLowerCase() == H2 || 
         tNodes[i].tagName.toLowerCase() == H3 )) 
         {
             console.log("1");
-            return tNodes[i];
+            return tNodes[i].textContent;
         }
     }
     // 2
     for (let i = 0; i < tNodes.length; i++) {
-        if ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string") ) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) || 
-                (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ) ) ||
-                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) || 
-                (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ) ) ) {
-            return tNodes[i];
+        if ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string") ) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(NAME)) || 
+                (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(TITLE)) ) ) ||
+                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) || 
+                (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ) ) ) {
+            console.log("2");
+            return tNodes[i].textContent;
         }
     }
     // added
     for (let i = 0; i < tNodes.length; i++) {
-        if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
-                (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(NAME)) ||
-                (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ||
-                (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) ) ) ||
+        if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(NAME)) ||
+                (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(NAME)) ) ) ||
 
-                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
-                (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(NAME)) ||
-                (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ||
-                (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) ) ) ) &&
+                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(NAME)) ||
+                (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) ) ) ) &&
 
                 ( tNodes[i].tagName == H1 || 
-                tNodes[i].tagName == H2 || 
-                tNodes[i].tagName == H3 ) ) { 
-            console.log("2");
+                tNodes[i].tagName == H2) ) { 
+            console.log("added");
+            return tNodes[i].textContent;
+        }
+    }
+    // added to separate above h1's and h2's from h3's
+    for (let i = 0; i < tNodes.length; i++) {
+        if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(NAME)) ||
+                (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(NAME)) ) ) ||
+
+                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(NAME)) ||
+                (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) ) ) ) &&
+
+                (tNodes[i].tagName == H3 ) ) { 
+            console.log("added");
             return tNodes[i].textContent;
         }
     }
     // 3
     for (let i = 0; i < tNodes.length; i++) {
-        if ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(TITLE)) ||
-                (tNodes[i].className.includes(PROD) && tNodes[i].className.includes(NAME)) ||
-                (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(TITLE)) ||
-                (tNodes[i].className.includes(ITEM) && tNodes[i].className.includes(NAME)) ) ) ||
+        if ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(NAME)) ||
+                (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(NAME)) ) ) ||
 
-                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(TITLE)) ||
-                (tNodes[i].id.includes(PROD) && tNodes[i].id.includes(NAME)) ||
-                (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(TITLE)) ||
-                (tNodes[i].id.includes(ITEM) && tNodes[i].id.includes(NAME)) ) ) ) {
+                ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(NAME)) ||
+                (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
+                (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) ) ) ) {
+            console.log("3");
             return tNodes[i].textContent;
         }
     }
+    // last resort - just get first h1, h2, or h3 element you see, should go below allNodes look up
+    for (let i = 0; i < tNodes.length; i++) {
+        if (tNodes[i].tagName == H1 || tNodes[i].tagName == H2 || tNodes[i].tagName == H3) {
+            console.log("last resort, h1, h2, or h3");
+            return tNodes[i].textContent;
+        }
+    }
+/* Not sure if this bit is necessary, cuz I'm returning the text content of whatever element it finds, and that includes all the 
+    child nodes' text content as well. Table this though cuz I'd just be doing more exhaustive guessing, not worth it rn
 
-        // else get all nodes, find something with p & i & t... and take first text node you find
-    /*for (let j = 0; j < allNodes.length; j++) {
-        let currNode2 = allNodes[j];
+    let allNodes = document.querySelector("body").getElementsByTagName("*");
 
+    for (let j = 0; j < allNodes.length; j++) {
         if ( ( (allNodes[j].className != null) && 
-        ( (allNodes[j].className.includes(PROD) && allNodes[j].className.includes(ITEM) && allNodes[j].className.includes(NAME)) || 
-        (allNodes[j].className.includes(PROD) && allNodes[j].className.includes(ITEM) && allNodes[j].className.includes(TITLE)) ) ) ||
-        ( (allNodes[j].id != null) && ( (allNodes[j].id.includes(PROD) && allNodes[j].id.includes(ITEM) && allNodes[j].id.includes(NAME)) || 
-        (allNodes[j].id.includes(PROD) && allNodes[j].id.includes(ITEM) && allNodes[j].id.includes(TITLE)) ) ) ) {
+        ( (allNodes[j].className.toLowerCase().includes(PROD) && allNodes[j].className.toLowerCase().includes(ITEM) && allNodes[j].className.toLowerCase().includes(NAME)) || 
+        (allNodes[j].className.toLowerCase().includes(PROD) && allNodes[j].className.toLowerCase().includes(ITEM) && allNodes[j].className.toLowerCase().includes(TITLE)) ) ) ||
+        ( (allNodes[j].id != null) && ( (allNodes[j].id.toLowerCase().includes(PROD) && allNodes[j].id.toLowerCase().includes(ITEM) && allNodes[j].id.toLowerCase().includes(NAME)) || 
+        (allNodes[j].id.toLowerCase().includes(PROD) && allNodes[j].id.toLowerCase().includes(ITEM) && allNodes[j].id.toLowerCase().includes(TITLE)) ) ) ) {
             let potNodes = textNodesUnder(allNodes[j]);
             if (potNodes[0] != null) {
                 return potNodes[0];
             }
             break;
-        } else if ( ( (allNodes[j].className != null) && ( (allNodes[j].className.includes(PROD) && allNodes[j].className.includes(TITLE)) ||
-        (allNodes[j].className.includes(PROD) && allNodes[j].className.includes(NAME)) ||
-        (allNodes[j].className.includes(ITEM) && allNodes[j].className.includes(TITLE)) ||
-        (allNodes[j].className.includes(ITEM) && allNodes[j].className.includes(NAME)) ) ) ||
+        } else if ( ( (allNodes[j].className != null) && ( (allNodes[j].className.toLowerCase().includes(PROD) && allNodes[j].className.toLowerCase().includes(TITLE)) ||
+        (allNodes[j].className.toLowerCase().includes(PROD) && allNodes[j].className.toLowerCase().includes(NAME)) ||
+        (allNodes[j].className.toLowerCase().includes(ITEM) && allNodes[j].className.toLowerCase().includes(TITLE)) ||
+        (allNodes[j].className.toLowerCase().includes(ITEM) && allNodes[j].className.toLowerCase().includes(NAME)) ) ) ||
 
-        ( (allNodes[j].id != null) && ( (allNodes[j].id.includes(PROD) && allNodes[j].id.includes(TITLE)) ||
-        (allNodes[j].id.includes(PROD) && allNodes[j].id.includes(NAME)) ||
-        (allNodes[j].id.includes(ITEM) && allNodes[j].id.includes(TITLE)) ||
-        (allNodes[j].id.includes(ITEM) && allNodes[j].id.includes(NAME)) ) ) ) {
+        ( (allNodes[j].id != null) && ( (allNodes[j].id.toLowerCase().includes(PROD) && allNodes[j].id.toLowerCase().includes(TITLE)) ||
+        (allNodes[j].id.toLowerCase().includes(PROD) && allNodes[j].id.toLowerCase().includes(NAME)) ||
+        (allNodes[j].id.toLowerCase().includes(ITEM) && allNodes[j].id.toLowerCase().includes(TITLE)) ||
+        (allNodes[j].id.toLowerCase().includes(ITEM) && allNodes[j].id.toLowerCase().includes(NAME)) ) ) ) {
             let potNodes = textNodesUnder(allNodes[j]);
             return potNodes[0];
         }
@@ -173,10 +193,48 @@ function textNodesUnder(el) {
     return a;
 }
 
+function guessImage(name) {
+    console.log(name + " typeof " + typeof name);
+    console.log(name.length);
+    let imgs = document.getElementsByTagName("img");
+
+    // console.log("width: " + x.clientWidth + " height: " + x.clientHeight);
+    // console.log("width: " + x.naturalWidth + " height: " + x.naturalHeight);
+    
+    for (let i = 0; i < imgs.length; i++) {
+        let img = imgs[i];
+        if (isVisible(img)) {
+            
+            /* sometimes websites don't have alt, need other methods
+            some websites have srcset's, responsive images, and should probably check those first if exists, then src if exists
+            didn't work on ebay, no idea why
+            yeah I think this alt="" method is best, just need a couple backups, like if it's in a range of dimensions? or it's the 
+            biggest img on the page, or if in a ImgContainer class or something
+            */
+            // string split into 4, maybe need to check how long a string is before we do this, cuz small strings could just get "ar" or something short
+            let str1 = name.substring(0, (name.length)/4);
+            let str2 = name.substring((name.length)/4, (name.length)/2);
+            let str3 = name.substring((name.length)/2, ((name.length)*(3/4)));
+            let str4 = name.substring(((name.length)*(3/4)), name.length);
+            console.log(str1 + "  " + str2 + "  " + str3 + "  " + str4);
+            if (img.getAttribute("alt").includes(str1) || img.getAttribute("alt").includes(str2) || 
+                img.getAttribute("alt").includes(str3) || img.getAttribute("alt").includes(str4) ||
+                img.getAttribute("alt").includes("Picture 1 of 11")) {
+                console.log(str1 + "  " + str2 + "  " + str3 + "  " + str4);
+                console.log("FOUND IT: " + img.src);
+            
+        }
+        }
+    }
+}
+
+function isVisible(el) {
+    return !!( el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+}
 
 /*
 For Product Image:
-usually has alt attribute with a string that includes the product's title
+usually has alt attribute with a string that toLowerCase().includes the product's title
 */
 
 
