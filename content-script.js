@@ -18,6 +18,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     let y = guessImage(name);
     console.log("guessImage() return: " + y);
+
+    guessPrice();
+    
     return true;
 });
 
@@ -76,8 +79,10 @@ function guessTitle() {
         tNodes[i].tagName.toLowerCase() == H2 || 
         tNodes[i].tagName.toLowerCase() == H3 )) 
         {
+            
             console.log("1");
             return tNodes[i].textContent;
+            
         }
     }
     // 2
@@ -86,8 +91,11 @@ function guessTitle() {
                 (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(TITLE)) ) ) ||
                 ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) || 
                 (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ) ) ) {
-            console.log("2");
-            return tNodes[i].textContent;
+            if ((window.scrollY + tNodes[i].getBoundingClientRect().top) < 600) {
+                console.log("2");
+                return tNodes[i].textContent;
+            }
+                    
         }
     }
     // added
@@ -106,11 +114,19 @@ function guessTitle() {
                 tNodes[i].tagName == H2) ) { 
             console.log("added");
             return tNodes[i].textContent;
+            
         }
     }
 
-    // get all nodes, p&n + h1 || h2, 
-    let allNodes = document.getElementsByTagName("*");
+    // get all nodes, p&n + h1 || h2
+    let potentialAllNodes = document.getElementsByTagName("*");
+    let allNodes = [];
+    for (let k = 0; k < potentialAllNodes.length; k++) {
+        if (isVisible(potentialAllNodes[k])) {
+            allNodes.push(potentialAllNodes[k]);
+        }
+    }
+    
 
     for (let i = 0; i < allNodes.length; i++) {
         if ( ( ( (allNodes[i].className != null && (typeof allNodes[i].className == "string")) && 
@@ -129,7 +145,9 @@ function guessTitle() {
             allNodes[i].tagName == H2) ) {
 
             if (allNodes[i].textContent != null) {
-                return allNodes[i].textContent;
+                if ((window.scrollY + allNodes[i].getBoundingClientRect().top) < 600) {
+                    return allNodes[i].textContent;
+                }
             }
         }
     }
@@ -148,8 +166,10 @@ function guessTitle() {
                 (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) ) ) ) &&
 
                 (tNodes[i].tagName == H3 ) ) {
-            console.log("added");
-            return tNodes[i].textContent;
+            if ((window.scrollY + tNodes[i].getBoundingClientRect().top) < 600) {
+                console.log("added");
+                return tNodes[i].textContent;
+            }
         }
     }
 
@@ -171,7 +191,9 @@ function guessTitle() {
             allNodes[i].tagName == H2) ) {
 
             if (allNodes[i].textContent != null) {
-                return allNodes[i].textContent;
+                if ((window.scrollY + allNodes[i].getBoundingClientRect().top) < 600) {
+                    return allNodes[i].textContent;
+                }
             }
         }
     }
@@ -189,8 +211,10 @@ function guessTitle() {
                 (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(NAME)) ||
                 (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
                 (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) ) ) ) {
-            console.log("3");
-            return tNodes[i].textContent;
+            if ((window.scrollY + tNodes[i].getBoundingClientRect().top) < 600) {
+                console.log("3");
+                return tNodes[i].textContent;
+            }
         }
     }
     
@@ -201,8 +225,10 @@ function guessTitle() {
     for (let i = 0; i < allNodes.length; i++) {
         if (allNodes[i].tagName == H1 || allNodes[i].tagName == H2 || allNodes[i].tagName == H3) {
             if (allNodes[i].textContent != null) {
-                console.log("last resort, h1, h2, or h3");
-                return allNodes[i].textContent;
+                if ((window.scrollY + allNodes[i].getBoundingClientRect().top) < 600) {
+                    console.log("last resort, h1, h2, or h3");
+                    return allNodes[i].textContent;
+                }
             }
         }
     }
@@ -279,9 +305,59 @@ function guessImage(name) {
     return "didn't find an image";
 }
 
+function guessPrice() {
+    let aNodes = document.getElementsByTagName("*");
+
+    /* go thru nodes, if visible, if has textContent good
+        check if contains direct text, check if that direct text has a $, then check if it's near top, then check strikethru,
+        then check if parent has a classname, and if it's a string, and if it includes "price"*/
+
+    let pNodes = [];
+    for (let i = 0; i < aNodes.length; i++) {
+        let curr = aNodes[i];
+        if (isVisible(curr) && (curr.textContent != null)) {
+            pNodes.push(curr);
+        }
+    }
+
+    for (let i = 0; i<pNodes.length; i++) {
+        let curr = pNodes[i]
+        let text = [].reduce.call(curr.childNodes, function(a, b) { return a + (b.nodeType === 3 ? b.textContent : ''); }, '');
+        if ( (text != null) && (text.includes("$") || text.includes("€")) && ((window.scrollY + curr.getBoundingClientRect().top) < 500) &&
+        (getComputedStyle(curr).getPropertyValue("text-decoration") != "line-through") && (curr.parentElement.className != null) &&
+        (typeof curr.parentElement.className == "string") && (curr.parentElement.className.toLowerCase().includes("price")) && 
+        curr.textContent.trim().length > 1) {
+            console.log("FOUND PRICE BRO: " + curr.textContent);
+            return;
+        }
+    }
+
+    for (let i = 0; i<pNodes.length; i++) {
+        let curr = pNodes[i];
+        if (curr.textContent != null && (curr.textContent.includes("$") || curr.textContent.includes("€")) && 
+            ((window.scrollY + curr.getBoundingClientRect().top) < 500) && curr.textContent.length < 10) {
+            console.log("found price from #2: " + curr.textContent);
+            return;
+            }
+    }
+
+    for (let i = 0; i<pNodes.length; i++) {
+        let curr = pNodes[i];
+        let text = [].reduce.call(curr.childNodes, function(a, b) { return a + (b.nodeType === 3 ? b.textContent : ''); }, '');
+
+        if (text != null && (text.includes("$") || text.includes("€")) ) {
+            console.log("found price from #3: " + curr.textContent);
+            return;
+        }
+    }
+    console.log("guessPrice() ran");
+}
+
 function isVisible(el) {
     return !!( el.offsetWidth || el.offsetHeight || el.getClientRects().length);
 }
+
+
 
 /*
 For Product Image:
