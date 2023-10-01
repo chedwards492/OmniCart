@@ -4,7 +4,20 @@ function onButtonClick() {
     alert('yup clicked');
 }
 
-// btn.addEventListener('click', onButtonClick);
+
+// this receives message directly from content-script; no going through service-worker, and works correctly
+chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
+    if (message.message == "send-item-info") {
+        console.log("SUCCESSFULY RECEIVED DATA FROM CONTENT SCRIPT here's the title: " + message.title);
+    }
+    sendResponse("yup");
+    return true;
+})
+
+
+chrome.runtime.sendMessage( {from: "cart.js"} );
+
+
 
 
 
@@ -41,4 +54,8 @@ function getNumItems() {
     let items = document.getElementsByClassName("grid-cart-item");
     alert(items.length);
     return items.length;
+}
+
+function generateItem() {
+
 }

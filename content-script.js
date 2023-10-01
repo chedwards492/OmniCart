@@ -1,17 +1,9 @@
-
-
 document.addEventListener("click", () => {
     console.log("clicked content script!!");
-
-
 });
 
-/* Receive message from service worker to collect item data - S */
+/* Receive message from service worker upon hotkey*/
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { 
-    if (message.message == "get-item-info") {
-        console.log(message.po);
-        //sendResponse({ response: document }); not sure if works or necessary
-    }
 
     let name = guessTitle();
     console.log("guessTitle() return: " + name);
@@ -21,13 +13,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     guessPrice();
     
+    // sends directly to content-script, no need to go thru service-worker.js
+    chrome.runtime.sendMessage({message: "send-item-info", title: name}, (response) => {
+        // having this response doesn't get rid of the returning true message channel closed
+    });
+    
     return true;
 });
-
-function test() {
-    //console.log("wtf going on");
-    console.log("test() ran");
-}
 
 /* Here begins the process of trying to create spew logic and conditional statements "smart" enough to 
     distinguish a product title, image, and price from other text on a page. Program this last b/c it's not
@@ -356,7 +348,6 @@ function guessPrice() {
 function isVisible(el) {
     return !!( el.offsetWidth || el.offsetHeight || el.getClientRects().length);
 }
-
 
 
 /*
