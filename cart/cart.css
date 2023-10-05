@@ -166,6 +166,7 @@ header {
 }
 
 .item-info-price {
+    font-size: 1.2rem;
     text-align: right;
     padding-top: 0.4rem;
     padding-right: 0.5rem;

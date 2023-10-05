@@ -2,24 +2,28 @@ document.addEventListener("click", () => {
     console.log("clicked content script!!");
 });
 
-/* Receive message from service worker upon hotkey*/
+/* Receive message from service worker upon command
+    Guess the item, and send to cart.js
+This might bring up problems if callgetItem doesn't return before return true runs */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { 
-
-    let name = guessTitle();
-    console.log("guessTitle() return: " + name);
-
-    let y = guessImage(name);
-    console.log("guessImage() return: " + y);
-
-    guessPrice();
-    
-    // sends directly to content-script, no need to go thru service-worker.js
-    chrome.runtime.sendMessage({message: "send-item-info", title: name}, (response) => {
-        // having this response doesn't get rid of the returning true message channel closed
-    });
-    
-    return true;
+    let callGetItem;
+    (callGetItem = async function() {
+        let item = await getItem();
+        // send item information to cart.js
+        chrome.runtime.sendMessage({message: "send-item-info", item: item});
+    })();
 });
+
+/* Called on shortcut command. Guesses item information
+    Return - object with guessed item information */
+async function getItem() {
+    let title = await guessTitle();
+    let image = await guessImage(title);
+    let price = await guessPrice();
+    return {
+        title: title, image: image, price: price
+    };
+}
 
 /* Here begins the process of trying to create spew logic and conditional statements "smart" enough to 
     distinguish a product title, image, and price from other text on a page. Program this last b/c it's not
@@ -27,9 +31,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     working in the actual product's page, not like a page with a bunch of products on it. Want Product title, image 
     (maybe even images if it's feasible), price, link, and which website it was from. Will then use that data to 
     piece together a little object in our shopping cart with that information readiyl available*/
-
-/* Try to find a potential Product Title */
-
 const PROD = "product";
 const ITEM = "item";
 const NAME = "name";
@@ -38,9 +39,8 @@ const H1 = "H1";
 const H2 = "H2";
 const H3 = "H3";
 
-/* div or span class w p&n that contains a h1/h2/h3
-add term "brand" to all of the checks */
-
+/* Guesses the product title 
+    Returns - string of the guessed product title */
 function guessTitle() {
 
     // get all nodes, then get just the nodes that have direct text in them
@@ -71,9 +71,7 @@ function guessTitle() {
         tNodes[i].tagName.toLowerCase() == H2 || 
         tNodes[i].tagName.toLowerCase() == H3 )) 
         {
-            
-            console.log("1");
-            return tNodes[i].textContent;
+            return tNodes[i].textContent.trim();
             
         }
     }
@@ -84,8 +82,7 @@ function guessTitle() {
                 ( (tNodes[i].id != null && (typeof tNodes[i].id == "string")) && ( (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) || 
                 (tNodes[i].id.toLowerCase().includes(PROD) && tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ) ) ) {
             if ((window.scrollY + tNodes[i].getBoundingClientRect().top) < 600) {
-                console.log("2");
-                return tNodes[i].textContent;
+                return tNodes[i].textContent.trim();;
             }
                     
         }
@@ -104,8 +101,7 @@ function guessTitle() {
 
                 ( tNodes[i].tagName == H1 || 
                 tNodes[i].tagName == H2) ) { 
-            console.log("added");
-            return tNodes[i].textContent;
+            return tNodes[i].textContent.trim();
             
         }
     }
@@ -138,7 +134,7 @@ function guessTitle() {
 
             if (allNodes[i].textContent != null) {
                 if ((window.scrollY + allNodes[i].getBoundingClientRect().top) < 600) {
-                    return allNodes[i].textContent;
+                    return allNodes[i].textContent.trim();
                 }
             }
         }
@@ -159,8 +155,7 @@ function guessTitle() {
 
                 (tNodes[i].tagName == H3 ) ) {
             if ((window.scrollY + tNodes[i].getBoundingClientRect().top) < 600) {
-                console.log("added");
-                return tNodes[i].textContent;
+                return tNodes[i].textContent.trim();
             }
         }
     }
@@ -184,7 +179,7 @@ function guessTitle() {
 
             if (allNodes[i].textContent != null) {
                 if ((window.scrollY + allNodes[i].getBoundingClientRect().top) < 600) {
-                    return allNodes[i].textContent;
+                    return allNodes[i].textContent.trim();
                 }
             }
         }
@@ -204,8 +199,7 @@ function guessTitle() {
                 (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(TITLE)) ||
                 (tNodes[i].id.toLowerCase().includes(ITEM) && tNodes[i].id.toLowerCase().includes(NAME)) ) ) ) {
             if ((window.scrollY + tNodes[i].getBoundingClientRect().top) < 600) {
-                console.log("3");
-                return tNodes[i].textContent;
+                return tNodes[i].textContent.trim();
             }
         }
     }
@@ -218,8 +212,7 @@ function guessTitle() {
         if (allNodes[i].tagName == H1 || allNodes[i].tagName == H2 || allNodes[i].tagName == H3) {
             if (allNodes[i].textContent != null) {
                 if ((window.scrollY + allNodes[i].getBoundingClientRect().top) < 600) {
-                    console.log("last resort, h1, h2, or h3");
-                    return allNodes[i].textContent;
+                    return allNodes[i].textContent.trim();
                 }
             }
         }
@@ -229,22 +222,27 @@ function guessTitle() {
     return str;
 }
 
+/* Determines whether a node contains direct text content
+    Returns boolean value */
 function containsDirectText(el) {
     return [...el.childNodes]
         .some(n => n.nodeType === Node.TEXT_NODE
               && n.nodeValue.trim() !== '');
   }
 
-
+/* Grabs all text nodes under a node
+    Param - a node
+    Returns - array of text nodes under parameter node */
 function textNodesUnder(el) {
     let n, a = [], walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
     while(n=walk.nextNode()) a.push(n);
     return a;
 }
 
+/* Guesses the product image
+    Param - the returned value from guessTitle
+    Returns - the src attribute of the img node, null otherwise */
 function guessImage(name) {
-    console.log(name + " typeof " + typeof name);
-    console.log(name.length);
     let imgs = document.getElementsByTagName("img");
 
     
@@ -252,8 +250,7 @@ function guessImage(name) {
         let img = imgs[i];
         if (isVisible(img) && ((window.scrollY + img.getBoundingClientRect().top) < 400) &&
             img.width > 400 && img.height > 400) {
-            console.log("found thrud dimensions: " + img.src);
-            return;
+            return img.src;
         }
     }
 
@@ -273,19 +270,16 @@ function guessImage(name) {
             let str2 = name.substring((name.length)/4, (name.length)/2);
             let str3 = name.substring((name.length)/2, ((name.length)*(3/4)));
             let str4 = name.substring(((name.length)*(3/4)), name.length);
-            console.log(str1 + "  " + str2 + "  " + str3 + "  " + str4);
             if (img.getAttribute("srcset") != null) {
                 if (img.getAttribute("srcset").includes(str1) || img.getAttribute("srcset").includes(str2) || 
                 img.getAttribute("srcset").includes(str3) || img.getAttribute("srcset").includes(str4)) {
-                    console.log("found srcset img: " + img.src);
-                    return;
+                    return img.src;
                 }
             }
             if (img.getAttribute("alt") != null) {
                 if (img.getAttribute("alt").includes(str1) || img.getAttribute("alt").includes(str2) || 
                     img.getAttribute("alt").includes(str3) || img.getAttribute("alt").includes(str4)) {
-                    console.log("FOUND IT alt: " + img.src);
-                    return;
+                    return img.src;
                 }
             }
             
@@ -293,10 +287,11 @@ function guessImage(name) {
     }
 
     
-    console.log("no img found");
-    return "didn't find an image";
+    return null;
 }
 
+/* Guesses the product price
+    Returns - string value of product price */
 function guessPrice() {
     let aNodes = document.getElementsByTagName("*");
 
@@ -319,8 +314,7 @@ function guessPrice() {
         (getComputedStyle(curr).getPropertyValue("text-decoration") != "line-through") && (curr.parentElement.className != null) &&
         (typeof curr.parentElement.className == "string") && (curr.parentElement.className.toLowerCase().includes("price")) && 
         curr.textContent.trim().length > 1) {
-            console.log("FOUND PRICE BRO: " + curr.textContent);
-            return;
+            return curr.textContent.trim();;
         }
     }
 
@@ -328,8 +322,7 @@ function guessPrice() {
         let curr = pNodes[i];
         if (curr.textContent != null && (curr.textContent.includes("$") || curr.textContent.includes("€")) && 
             ((window.scrollY + curr.getBoundingClientRect().top) < 500) && curr.textContent.length < 10) {
-            console.log("found price from #2: " + curr.textContent);
-            return;
+            return curr.textContent.trim();
             }
     }
 
@@ -338,22 +331,20 @@ function guessPrice() {
         let text = [].reduce.call(curr.childNodes, function(a, b) { return a + (b.nodeType === 3 ? b.textContent : ''); }, '');
 
         if (text != null && (text.includes("$") || text.includes("€")) ) {
-            console.log("found price from #3: " + curr.textContent);
-            return;
+            return curr.textContent.trim();
         }
     }
-    console.log("guessPrice() ran");
+    return null;
 }
 
+/* Tells whether an element is visible on the page
+Param - the element of significance
+Returns boolean value whether param el is visible on page*/
 function isVisible(el) {
     return !!( el.offsetWidth || el.offsetHeight || el.getClientRects().length);
 }
 
 
-/*
-For Product Image:
-usually has alt attribute with a string that toLowerCase().includes the product's title
-*/
 
 
 /* https://stackoverflow.com/questions/13917047/how-to-get-a-content-script-to-load-after-a-pages-javascript-has-executed

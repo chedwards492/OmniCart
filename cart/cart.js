@@ -5,45 +5,50 @@ function onButtonClick() {
 }
 
 
-
-
-/* Am gonna need to do this in a whole async function, cuz we have to receive the info before we put it into the page,
-so gotta figure this out */
-
-
-// this receives message directly from content-script; no going through service-worker, and works correctly
-let guessedTitle;
+/* Receives message from content script. Saves item information  */
+let guessedItem;
 chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
     if (message.message == "send-item-info") {
-        console.log("SUCCESSFULY RECEIVED DATA FROM CONTENT SCRIPT here's the title: " + message.title);
-        guessedTitle = message.title;
+        guessedItem = message.item;
+    
+        console.log(guessedItem);
+        
+        chrome.storage.local.get(["items"]).finally(result => console.log("RESULT: " + result));
+        if ( (chrome.storage.local.get(["items"], (result) => {return result; })) == null) {
+            console.log("could not find any items");
+        }
+        
+        addCartItem(guessedItem);
     }
-    sendResponse("yup");
     return true;
 })
 
+/* on run, need to populate the cart with the items, and when i add an item, need to put it in storage */
 
-chrome.runtime.sendMessage( {from: "cart.js"} );
+
+// chrome.runtime.sendMessage( {from: "cart.js"} );
 
 // document.querySelector(".h1-title").style.color = "red";
-document.querySelector(".grid-cart").insertAdjacentHTML("beforeend", 
-`   <div class="grid-cart-item">
-        <a href="https://www.google.com" target="_blank">'<img src="" alt="Product Image" class="item-img"></a>    
+function addCartItem(item) {
+    document.querySelector(".grid-cart").insertAdjacentHTML("beforeend", 
+    `
+    <div class="grid-cart-item">
+        <a href="https://www.google.com" target="_blank">'<img src="${item.image}" alt="Product Image" class="item-img"></a>    
         <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
             <div class="grid-item-info">
-                <a href="https://www.google.com" target="_blank" class="item-title">asefsef</a>
+                <a href="https://www.google.com" target="_blank" class="item-title">${item.title}</a>
                 <div class="item-store"></div>
                 <div class="grid-delete-copy">
                     <button class="delete-button" onclick="deleteCartItem(this)"></button>
                     <button class="copy-link-btn" onclick="copyLink(this)">Copy link</button>
                 </div>
             </div>
-            <div class="item-info-price">$100.00</div>
+            <div class="item-info-price">${item.price}</div>
         </div>
     </div>
     `);
-console.log("boutta add the title");
-document.querySelector(".grid-cart").lastChild.querySelector("a.item-title").textContent = guessedTitle;
+}
+
 
 
 
@@ -81,8 +86,4 @@ function getNumItems() {
     let items = document.getElementsByClassName("grid-cart-item");
     alert(items.length);
     return items.length;
-}
-
-function generateItem() {
-
 }
