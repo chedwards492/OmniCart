@@ -5,10 +5,18 @@ function onButtonClick() {
 }
 
 
+
+
+/* Am gonna need to do this in a whole async function, cuz we have to receive the info before we put it into the page,
+so gotta figure this out */
+
+
 // this receives message directly from content-script; no going through service-worker, and works correctly
+let guessedTitle;
 chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
     if (message.message == "send-item-info") {
         console.log("SUCCESSFULY RECEIVED DATA FROM CONTENT SCRIPT here's the title: " + message.title);
+        guessedTitle = message.title;
     }
     sendResponse("yup");
     return true;
@@ -17,6 +25,25 @@ chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
 
 chrome.runtime.sendMessage( {from: "cart.js"} );
 
+// document.querySelector(".h1-title").style.color = "red";
+document.querySelector(".grid-cart").insertAdjacentHTML("beforeend", 
+`   <div class="grid-cart-item">
+        <a href="https://www.google.com" target="_blank">'<img src="" alt="Product Image" class="item-img"></a>    
+        <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
+            <div class="grid-item-info">
+                <a href="https://www.google.com" target="_blank" class="item-title">asefsef</a>
+                <div class="item-store"></div>
+                <div class="grid-delete-copy">
+                    <button class="delete-button" onclick="deleteCartItem(this)"></button>
+                    <button class="copy-link-btn" onclick="copyLink(this)">Copy link</button>
+                </div>
+            </div>
+            <div class="item-info-price">$100.00</div>
+        </div>
+    </div>
+    `);
+console.log("boutta add the title");
+document.querySelector(".grid-cart").lastChild.querySelector("a.item-title").textContent = guessedTitle;
 
 
 
