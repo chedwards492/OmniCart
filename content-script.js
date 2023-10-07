@@ -10,9 +10,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     (callGetItem = async function() {
         let item = await getItem();
         // send item information to cart.js
-        chrome.runtime.sendMessage({message: "send-item-info", item: item});
+        chrome.runtime.sendMessage({message: "send-item-info", item: item}); // not sure if necessary, cuz could just do a storage.onChanged, but that's a lil more complicated
+        console.log("boutta run addCartItem()");
+        addCartItem(item);
     })();
+    sendResponse({y: true});
+    return true;
 });
+
 
 /* Called on shortcut command. Guesses item information
     Return - object with guessed item information */
@@ -23,6 +28,17 @@ async function getItem() {
     return {
         title: title, image: image, price: price
     };
+}
+
+/* Adds item to underlying cartItems array. Adds item to shopping cart interface 
+@return - void 
+@param - item: the item to add to cart */
+function addCartItem(item) {
+    console.log("addCartItem() ran " + JSON.stringify(item));
+    chrome.storage.local.get(["items"], (result) => {
+        console.log("addCartItem() success " + result.items);
+        result.items.push(item);
+    });
 }
 
 /* Here begins the process of trying to create spew logic and conditional statements "smart" enough to 

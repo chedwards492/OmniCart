@@ -4,32 +4,74 @@ function onButtonClick() {
     alert('yup clicked');
 }
 
+// let cartItems = [{title: "thing1", image: "something.png", price: "$69.69"}, {title: "thing2", image: "something2.png", price: "900.99"}];
+/* workflow:
+onStartup, need to populate the cart with all our items, should be an array cartItems of {title, image, price} objects
+when user hotkeys and adds item to cartItems[].*/
+
+
+// chrome.storage.local.get(["items"], async (result) => {
+//     console.log("POOPPPPyyyyy: " + JSON.stringify(result));
+//     if (result.items == undefined) {
+//         await chrome.storage.local.set( {items: []} )
+//     }
+// });
+
+/* Problem I got is that I need cartItems to be an array that can be accessed globally, but I need it to not be initialized everytime I open the cart interface, cuz
+it's resetting it to undefined and deleting all the items from it, so maybe call from different script, or on a specific event..? idk */
+
+
+chrome.storage.local.get(["items"], async (result) => {
+    console.log("result: " + JSON.stringify(result) + " yu " + result.items);
+    if (result.items == undefined) {
+        chrome.storage.local.set( {items: []} );
+        console.log("initialized backend array");
+    }
+});
+
+populateCart();
+
+//chrome.storage.local.remove("items");
 
 /* Receives message from content script. Saves item information  */
 let guessedItem;
 chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
     if (message.message == "send-item-info") {
         guessedItem = message.item;
-    
-        console.log(guessedItem);
-        
-        chrome.storage.local.get(["items"]).finally(result => console.log("RESULT: " + result));
-        if ( (chrome.storage.local.get(["items"], (result) => {return result; })) == null) {
-            console.log("could not find any items");
-        }
-        
-        addCartItem(guessedItem);
+        addCartItemToInterface(guessedItem); // could maybe replace this with a storage.onChanged event, but then i'd have to check
     }
+    sendResponse({x: true});
     return true;
-})
-
-/* on run, need to populate the cart with the items, and when i add an item, need to put it in storage */
+});
 
 
-// chrome.runtime.sendMessage( {from: "cart.js"} );
+/* GOT IT working for the most part. It still can't call it when cart.js is not running, cuz i send something to it when command is pressed. I think I could do like, when 
+command is pressed, fine, call addCartItem() to add it the storage. Then in cart.js, I have a storage.onChanged listener, that just adds any object that has not yet been 
+added. Seems difficult to get around this idk */
 
-// document.querySelector(".h1-title").style.color = "red";
-function addCartItem(item) {
+
+/* Populates items into cart interface from storage. Called on startup
+@return - void */
+async function populateCart() {
+    console.log("populateCart() ran");
+    let arr;
+    await chrome.storage.local.get(["items"], async (result) => {
+        arr = await result.items
+        console.log("populateCart() arr: " + result.items);
+        if (arr.length != 0) {
+            for (let item of arr) {
+                addCartItemToInterface(item);
+            }
+        }
+    });
+}
+
+
+/* Adds html for parameter item. Only called in popoulateCart()
+@return - void
+@param - item: the item to add to the cart */
+function addCartItemToInterface(item) {
+    console.log("addCartItemToInteface() ran");
     document.querySelector(".grid-cart").insertAdjacentHTML("beforeend", 
     `
     <div class="grid-cart-item">
@@ -48,8 +90,6 @@ function addCartItem(item) {
     </div>
     `);
 }
-
-
 
 
 

@@ -1,5 +1,8 @@
 console.log("this is the service worker");
 
+
+
+
 let document;
 
 chrome.commands.onCommand.addListener((command) => {
@@ -14,6 +17,7 @@ chrome.commands.onCommand.addListener((command) => {
         });
 
     });
+    return true;
 });
 
 /* this is the code that gets message from cart.js in order to get its tab.id, and then use that and so content script can send to
