@@ -6,14 +6,17 @@ document.addEventListener("click", () => {
     Guess the item, and send to cart.js
 This might bring up problems if callgetItem doesn't return before return true runs */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { 
-    let callGetItem;
-    (callGetItem = async function() {
-        let item = await getItem();
-        // send item information to cart.js
-        chrome.runtime.sendMessage({message: "send-item-info", item: item}); // not sure if necessary, cuz could just do a storage.onChanged, but that's a lil more complicated
-        console.log("boutta run addCartItem()");
-        addCartItem(item);
-    })();
+    if (message.message = "get-item-info") {
+        let callGetItem;
+        (callGetItem = async function() {
+            let item = await getItem();
+            // send item information to cart.js
+            chrome.runtime.sendMessage({message: "send-item-info", item: item}); // not sure if necessary, cuz could just do a storage.onChanged, but that's a lil more complicated
+            // instead of ^ try adding to local storage
+            console.log("boutta run addCartItem()");
+            addCartItem(item);
+        })();
+    }
     sendResponse({y: true});
     return true;
 });
@@ -33,11 +36,22 @@ async function getItem() {
 /* Adds item to underlying cartItems array. Adds item to shopping cart interface 
 @return - void 
 @param - item: the item to add to cart */
-function addCartItem(item) {
-    console.log("addCartItem() ran " + JSON.stringify(item));
+function addCartItem(newItem) {
+
+    //chrome.storage.local.clear();
+    console.log("addCartItem() ran " + JSON.stringify(newItem));
     chrome.storage.local.get(["items"], (result) => {
-        console.log("addCartItem() success " + result.items);
-        result.items.push(item);
+        if (typeof(result.items) != undefined && result.items instanceof Array) {
+            result.items.push(newItem);
+        }
+        chrome.storage.local.set(result);
+        // console.log("stringify(result) " + JSON.stringify(result) + "   stringify(result.items): " + JSON.stringify(result.items));
+        // // console.log("result: " + JSON.stringify(result));
+        // // result.items.push(item);
+        // // let newArr = result.items;
+        // //chrome.storage.local.set( {items: newArr} );
+        // // console.log("addCartItem() success " + JSON.stringify(result.items));
+        // // console.log("items array " + JSON.stringify(result));
     });
 }
 

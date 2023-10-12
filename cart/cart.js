@@ -17,9 +17,6 @@ when user hotkeys and adds item to cartItems[].*/
 //     }
 // });
 
-/* Problem I got is that I need cartItems to be an array that can be accessed globally, but I need it to not be initialized everytime I open the cart interface, cuz
-it's resetting it to undefined and deleting all the items from it, so maybe call from different script, or on a specific event..? idk */
-
 
 chrome.storage.local.get(["items"], async (result) => {
     console.log("result: " + JSON.stringify(result) + " yu " + result.items);
