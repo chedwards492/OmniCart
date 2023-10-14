@@ -153,7 +153,10 @@ header {
     margin-left: 0.3rem;
 
     border: none;
+
+    cursor: pointer;
 }
+
 
 .copy-link-btn {
     min-height: 2rem;

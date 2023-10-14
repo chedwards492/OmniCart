@@ -1,50 +1,59 @@
 let btn = document.querySelector(".delete-button");
-
+let numItems=0;
 function onButtonClick() {
     alert('yup clicked');
 }
 
-// let cartItems = [{title: "thing1", image: "something.png", price: "$69.69"}, {title: "thing2", image: "something2.png", price: "900.99"}];
-/* workflow:
-onStartup, need to populate the cart with all our items, should be an array cartItems of {title, image, price} objects
-when user hotkeys and adds item to cartItems[].*/
+if (window.addEventListener("load", () => {
+    let deleteBtnArr = [];
+    deleteBtnArr = document.getElementsByClassName("delete-button");
+    for (btn of deleteBtnArr) {
+        btn.onclick = () => {
+            deleteCartItem(btn);
+        };
+    }
+}));
+// let deleteBtnArr = [];
+// deleteBtnArr = document.getElementsByClassName("delete-button");
+// console.log("deleteBtnArr: " + JSON.stringify(deleteBtnArr));
+// console.log("here: " + JSON.stringify(document.querySelector(".delete-button")));
 
-
-// chrome.storage.local.get(["items"], async (result) => {
-//     console.log("POOPPPPyyyyy: " + JSON.stringify(result));
-//     if (result.items == undefined) {
-//         await chrome.storage.local.set( {items: []} )
-//     }
+// deleteBtn.addEventListener("click", () => {
+//     alert("delete button clicked");
 // });
+
+// deleteBtn.addEventListener("click", deleteCartItem(deleteBtn));
 
 
 chrome.storage.local.get(["items"], async (result) => {
-    console.log("result: " + JSON.stringify(result) + " yu " + result.items);
+    console.log("set items");
     if (result.items == undefined) {
         chrome.storage.local.set( {items: []} );
         console.log("initialized backend array");
     }
+    numItems = result.items.length;
+    console.log("numItems: " + numItems);
+    
 });
+
+/* Listen for "Add item" command, update cart html with new item if so */
+
+chrome.storage.onChanged.addListener( () =>  {
+    chrome.storage.local.get(["items"], (result) => {
+        if (numItems <= result.items.length) {
+            addCartItemToInterface(result.items[result.items.length-1]);
+        }
+        numItems = result.items.length;
+        console.log("new numItems " + numItems);
+    })
+});
+
+
+
+
+
 
 populateCart();
-
-//chrome.storage.local.remove("items");
-
-/* Receives message from content script. Saves item information  */
-let guessedItem;
-chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
-    if (message.message == "send-item-info") {
-        guessedItem = message.item;
-        addCartItemToInterface(guessedItem); // could maybe replace this with a storage.onChanged event, but then i'd have to check
-    }
-    sendResponse({x: true});
-    return true;
-});
-
-
-/* GOT IT working for the most part. It still can't call it when cart.js is not running, cuz i send something to it when command is pressed. I think I could do like, when 
-command is pressed, fine, call addCartItem() to add it the storage. Then in cart.js, I have a storage.onChanged listener, that just adds any object that has not yet been 
-added. Seems difficult to get around this idk */
 
 
 /* Populates items into cart interface from storage. Called on startup
@@ -64,7 +73,7 @@ async function populateCart() {
 }
 
 
-/* Adds html for parameter item. Only called in popoulateCart()
+/* Adds html for parameter item. Does not change storage.local
 @return - void
 @param - item: the item to add to the cart */
 function addCartItemToInterface(item) {
@@ -78,7 +87,7 @@ function addCartItemToInterface(item) {
                 <a href="https://www.google.com" target="_blank" class="item-title">${item.title}</a>
                 <div class="item-store"></div>
                 <div class="grid-delete-copy">
-                    <button class="delete-button" onclick="deleteCartItem(this)"></button>
+                    <button class="delete-button"></button>
                     <button class="copy-link-btn" onclick="copyLink(this)">Copy link</button>
                 </div>
             </div>
@@ -101,9 +110,43 @@ function copyLink(val) {
     alert("copied the link: " + copiedLink);
 }
 
+/* strange behavior when trying to delete. seems like the storage gets updated like it should with numItems and such, and things getting
+added work fine(?) but deleting is weird and it deletes the item below itself instead. just debug */
 /* Deletes specified cart item - trash can button */
 function deleteCartItem(val) {
-    val.parentElement.parentElement.parentElement.parentElement.remove();
+    console.log("deleteCartItem running");
+    let image = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-img").getAttribute("src");
+    let titleNode = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-title");
+    let title = [].reduce.call(titleNode.childNodes, function(a, b) { return a + (b.nodeType === 3 ? b.textContent : ''); }, '');
+    let priceNode = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-info-price");
+    let price = [].reduce.call(priceNode.childNodes, function(a, b) { return a + (b.nodeType === 3 ? b.textContent : ''); }, '');
+    
+    let thisObj = {
+        image: image,
+        price: price,
+        title: title
+    };
+
+    chrome.storage.local.get(["items"], (result) => {
+        for (elm of result.items) {
+            console.log(JSON.stringify("object in local storage: " + elm));
+            console.log(JSON.stringify(elm) + " " + JSON.stringify(thisObj));
+            if (JSON.stringify(elm) === JSON.stringify(thisObj)) {
+                let ind = result.items.indexOf(elm);
+                result.items.splice(ind, 1);
+                chrome.storage.local.set(result);
+                numItems--;
+            }
+        }
+    });
+
+
+    // removes from html
+    // val.parentElement.parentElement.parentElement.parentElement.remove();
+
+    // also need to get the item out of storage
+    
+
 
 }
 
@@ -118,7 +161,9 @@ function getSum() {
     return sum;
 }
 
-// works
+/* Gets the number of items on the interface itself
+Returns - integer of numebr of items just on interface
+*/
 function getNumItems() {
     let items = document.getElementsByClassName("grid-cart-item");
     alert(items.length);
