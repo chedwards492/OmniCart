@@ -1,28 +1,22 @@
-let btn = document.querySelector(".delete-button");
 let numItems=0;
+populateCart();
+let btn = document.querySelector(".delete-button");
 function onButtonClick() {
     alert('yup clicked');
 }
 
 if (window.addEventListener("load", () => {
+    console.log("loaded");
     let deleteBtnArr = [];
     deleteBtnArr = document.getElementsByClassName("delete-button");
-    for (btn of deleteBtnArr) {
-        btn.onclick = () => {
-            deleteCartItem(btn);
+    for (let i = 0; i < deleteBtnArr.length; i++) {
+        console.log("adding delete functionality to: " + deleteBtnArr[i].parentElement.parentElement.querySelector(".item-title").textContent);
+        deleteBtnArr[i].onclick = () => {
+            deleteCartItem(deleteBtnArr[i]);
         };
     }
 }));
-// let deleteBtnArr = [];
-// deleteBtnArr = document.getElementsByClassName("delete-button");
-// console.log("deleteBtnArr: " + JSON.stringify(deleteBtnArr));
-// console.log("here: " + JSON.stringify(document.querySelector(".delete-button")));
 
-// deleteBtn.addEventListener("click", () => {
-//     alert("delete button clicked");
-// });
-
-// deleteBtn.addEventListener("click", deleteCartItem(deleteBtn));
 
 
 chrome.storage.local.get(["items"], async (result) => {
@@ -39,6 +33,7 @@ chrome.storage.local.get(["items"], async (result) => {
 /* Listen for "Add item" command, update cart html with new item if so */
 
 chrome.storage.onChanged.addListener( () =>  {
+    console.log("Storage Changed.");
     chrome.storage.local.get(["items"], (result) => {
         if (numItems <= result.items.length) {
             addCartItemToInterface(result.items[result.items.length-1]);
@@ -52,10 +47,6 @@ chrome.storage.onChanged.addListener( () =>  {
 
 
 
-
-populateCart();
-
-
 /* Populates items into cart interface from storage. Called on startup
 @return - void */
 async function populateCart() {
@@ -67,6 +58,7 @@ async function populateCart() {
         if (arr.length != 0) {
             for (let item of arr) {
                 addCartItemToInterface(item);
+                numItems++;
             }
         }
     });
@@ -95,6 +87,17 @@ function addCartItemToInterface(item) {
         </div>
     </div>
     `);
+
+    let deleteBtnArr = [];
+    deleteBtnArr = document.getElementsByClassName("delete-button");
+    for (let i = 0; i < deleteBtnArr.length; i++) {
+        if (btn.onclick == null) {
+            console.log("adding delete functionality to: " + deleteBtnArr[i].parentElement.parentElement.querySelector(".item-title").textContent);
+            deleteBtnArr[i].onclick = () => {
+                deleteCartItem(deleteBtnArr[i]);
+            };
+        }
+    }   
 }
 
 
@@ -114,7 +117,7 @@ function copyLink(val) {
 added work fine(?) but deleting is weird and it deletes the item below itself instead. just debug */
 /* Deletes specified cart item - trash can button */
 function deleteCartItem(val) {
-    console.log("deleteCartItem running");
+    console.log("deleteCartItem ran, val: " + val.parentElement.parentElement.querySelector(".item-title").textContent);
     let image = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-img").getAttribute("src");
     let titleNode = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-title");
     let title = [].reduce.call(titleNode.childNodes, function(a, b) { return a + (b.nodeType === 3 ? b.textContent : ''); }, '');
@@ -127,27 +130,26 @@ function deleteCartItem(val) {
         title: title
     };
 
+    console.log("1");
+
+    val.parentElement.parentElement.parentElement.parentElement.remove();
+
+    console.log("2");
+
     chrome.storage.local.get(["items"], (result) => {
+        console.log("result.items: " + JSON.stringify(result.items));
+        console.log("thisObj: " + JSON.stringify(thisObj));
+        console.log("3");
         for (elm of result.items) {
-            console.log(JSON.stringify("object in local storage: " + elm));
-            console.log(JSON.stringify(elm) + " " + JSON.stringify(thisObj));
+            console.log("elm: " + JSON.stringify(elm));
             if (JSON.stringify(elm) === JSON.stringify(thisObj)) {
+                console.log("4");
                 let ind = result.items.indexOf(elm);
                 result.items.splice(ind, 1);
                 chrome.storage.local.set(result);
-                numItems--;
             }
         }
     });
-
-
-    // removes from html
-    // val.parentElement.parentElement.parentElement.parentElement.remove();
-
-    // also need to get the item out of storage
-    
-
-
 }
 
 /* table this cuz I need a way to get the price out of the item */

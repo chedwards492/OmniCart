@@ -15,7 +15,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             // send item information to cart.js NEED TO GET RID OF THIS WHEN IMPLEMENT ONCHANGED EVENT LISTENER
             //chrome.runtime.sendMessage({message: "send-item-info", item: item}); // not sure if necessary, cuz could just do a storage.onChanged, but that's a lil more complicated
             // instead of ^ try adding to local storage
-            console.log("boutta run addCartItem()");
             addCartItem(item);
         })();
     }
@@ -27,6 +26,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 /* Called on shortcut command. Guesses item information
     Return - object with guessed item information */
 async function getItem() {
+    console.log("getItem() ran");
     let title = await guessTitle();
     let image = await guessImage(title);
     let price = await guessPrice();
@@ -39,8 +39,7 @@ async function getItem() {
 @return - void 
 @param - item: the item to add to cart */
 function addCartItem(newItem) {
-
-    console.log("addCartItem() ran " + JSON.stringify(newItem));
+    console.log("addCartItem() ran ");
     chrome.storage.local.get(["items"], (result) => {
         if (typeof(result.items) != undefined && result.items instanceof Array) {
             result.items.push(newItem);
