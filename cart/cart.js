@@ -31,7 +31,6 @@ chrome.storage.local.get(["items"], async (result) => {
 });
 
 /* Listen for "Add item" command, update cart html with new item if so */
-
 chrome.storage.onChanged.addListener( () =>  {
     console.log("Storage Changed.");
     chrome.storage.local.get(["items"], (result) => {
@@ -68,9 +67,9 @@ async function populateCart() {
 /* Adds html for parameter item. Does not change storage.local
 @return - void
 @param - item: the item to add to the cart */
-function addCartItemToInterface(item) {
+async function addCartItemToInterface(item) {
     console.log("addCartItemToInteface() ran");
-    document.querySelector(".grid-cart").insertAdjacentHTML("beforeend", 
+    await document.querySelector(".grid-cart").insertAdjacentHTML("beforeend", 
     `
     <div class="grid-cart-item">
         <a href="https://www.google.com" target="_blank">'<img src="${item.image}" alt="Product Image" class="item-img"></a>    
@@ -88,10 +87,17 @@ function addCartItemToInterface(item) {
     </div>
     `);
 
+    let temp = [];
     let deleteBtnArr = [];
-    deleteBtnArr = document.getElementsByClassName("delete-button");
+    temp = document.getElementsByClassName("delete-button");
+    console.log("deleteBtnArr: " + deleteBtnArr);
+    for (btn of temp) {
+        if (!!( btn.offsetWidth || btn.offsetHeight || btn.getClientRects().length)) {
+            deleteBtnArr.push(btn);
+        }
+    }
     for (let i = 0; i < deleteBtnArr.length; i++) {
-        if (btn.onclick == null) {
+        if (typeof btn.onclick != "deleteCartItem") {
             console.log("adding delete functionality to: " + deleteBtnArr[i].parentElement.parentElement.querySelector(".item-title").textContent);
             deleteBtnArr[i].onclick = () => {
                 deleteCartItem(deleteBtnArr[i]);
@@ -113,10 +119,10 @@ function copyLink(val) {
     alert("copied the link: " + copiedLink);
 }
 
-/* strange behavior when trying to delete. seems like the storage gets updated like it should with numItems and such, and things getting
-added work fine(?) but deleting is weird and it deletes the item below itself instead. just debug */
 /* Deletes specified cart item - trash can button */
 function deleteCartItem(val) {
+    console.log("val.parentElement" + val.parentElement);
+    console.log("val.parentElement.parentElement" + JSON.stringify(val.parentElement.parentElement));
     console.log("deleteCartItem ran, val: " + val.parentElement.parentElement.querySelector(".item-title").textContent);
     let image = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-img").getAttribute("src");
     let titleNode = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-title");
