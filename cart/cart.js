@@ -1,9 +1,11 @@
 let numItems=0;
 populateCart();
+//getSum();
 let btn = document.querySelector(".delete-button");
 function onButtonClick() {
     alert('yup clicked');
 }
+
 
 if (window.addEventListener("load", () => {
     console.log("loaded");
@@ -84,9 +86,9 @@ async function addCartItemToInterface(item) {
             </div>
             <div class="item-info-price">${item.price}</div>
         </div>
-    </div>
+    </div> 
     `);
-
+//asdf
     let temp = [];
     let deleteBtnArr = [];
     temp = document.getElementsByClassName("delete-button");
@@ -104,6 +106,7 @@ async function addCartItemToInterface(item) {
             };
         }
     }   
+    //getSum();
 }
 
 
@@ -121,9 +124,9 @@ function copyLink(val) {
 
 /* Deletes specified cart item - trash can button */
 function deleteCartItem(val) {
-    console.log("val.parentElement" + val.parentElement);
-    console.log("val.parentElement.parentElement" + JSON.stringify(val.parentElement.parentElement));
-    console.log("deleteCartItem ran, val: " + val.parentElement.parentElement.querySelector(".item-title").textContent);
+    // console.log("val.parentElement" + val.parentElement);
+    // console.log("val.parentElement.parentElement" + JSON.stringify(val.parentElement.parentElement));
+    // console.log("deleteCartItem ran, val: " + val.parentElement.parentElement.querySelector(".item-title").textContent);
     let image = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-img").getAttribute("src");
     let titleNode = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-title");
     let title = [].reduce.call(titleNode.childNodes, function(a, b) { return a + (b.nodeType === 3 ? b.textContent : ''); }, '');
@@ -156,17 +159,20 @@ function deleteCartItem(val) {
             }
         }
     });
+    //getSum();
 }
 
-/* table this cuz I need a way to get the price out of the item */
+/* Calculates and updates the sum total. 
+This is an inexpensive procedure but it could be made more efficient.
+Runs whenever anything is deleted or added to cart. */
 function getSum() {
     let prices = document.getElementsByClassName("item-info-price");
     let sum = 0;
     for (let i = 0; i < prices.length; i++) {
-        sum += prices[i].textContent;
+        sum += parseInt(prices[i].textContent.match(/(\d+)/));
     }
-    alert(prices[0].textContent);
-    return sum;
+    let total = document.querySelector(".sum-total");
+    total.textContent = "Total: $" + sum;
 }
 
 /* Gets the number of items on the interface itself

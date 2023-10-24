@@ -36,7 +36,3 @@ content script can send messages directly to cart.js */
 //     }
 // })
 
-// function guessTitle() {
-//     console.log("guessTitle ran in service worker");
-//     return "yuP";
-// }
