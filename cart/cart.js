@@ -63,6 +63,10 @@ async function populateCart() {
     });
 }
 
+/* there's definitely some indexing issue with delete stuff, cuz when it gets down to the last item, it's null, and occasionally
+I try to delete the top element and it deletes the one just below, might wanna think about scrapping the current process cuz there's
+gotta be a better way to go about this? idk */
+
 
 /* Adds html for parameter item. Does not change storage.local
 @return - void
@@ -87,25 +91,33 @@ async function addCartItemToInterface(item) {
     </div>
     `);
 
+    addDeleteFunctionality();
+    getSum();
+    getNumItems();
+}
+
+/* Adds the deleteCartItem function to buttons that do not have defined functionality */
+function addDeleteFunctionality() {
     let temp = [];
     let deleteBtnArr = [];
     temp = document.getElementsByClassName("delete-button");
-    console.log("deleteBtnArr: " + deleteBtnArr);
     for (btn of temp) {
         if (!!( btn.offsetWidth || btn.offsetHeight || btn.getClientRects().length)) {
             deleteBtnArr.push(btn);
         }
     }
+    console.log("deleteBtnArr.length: " + deleteBtnArr.length);
     for (let i = 0; i < deleteBtnArr.length; i++) {
-        if (typeof btn.onclick != "deleteCartItem") {
+        console.log("onclick: " + deleteBtnArr[i].onclick);
+        console.log("deleteBtnArr[i]: " + deleteBtnArr[i]);
+        if (deleteBtnArr[i].onclick == null) {
             console.log("adding delete functionality to: " + deleteBtnArr[i].parentElement.parentElement.querySelector(".item-title").textContent);
             deleteBtnArr[i].onclick = () => {
                 deleteCartItem(deleteBtnArr[i]);
             };
         }
-    }   
+    }
 }
-
 
 
 /* this alerts properly but the link does not acc get copied to my clipboard, might just be b/c it's a live server tho so idk 
@@ -119,8 +131,17 @@ function copyLink(val) {
     alert("copied the link: " + copiedLink);
 }
 
+/* delete has issues when you add some stuff to cart, close the tab, then open it back up and try deleting things, parentElement 
+undefined is the consistent error */
+
 /* Deletes specified cart item - trash can button */
-function deleteCartItem(val) {
+async function deleteCartItem(val) {
+    if (val == undefined || val == null) {
+        console.log("running addDeleteFunctionality()");
+        await addDeleteFunctionality();
+        console.log("ran addDeleteFunctinoality within deleteCartItem()");
+    }
+    console.log("val: " + val + "json val: " + JSON.stringify(val));
     console.log("val.parentElement" + val.parentElement);
     console.log("val.parentElement.parentElement" + JSON.stringify(val.parentElement.parentElement));
     console.log("deleteCartItem ran, val: " + val.parentElement.parentElement.querySelector(".item-title").textContent);
@@ -136,16 +157,11 @@ function deleteCartItem(val) {
         title: title
     };
 
-    console.log("1");
-
     val.parentElement.parentElement.parentElement.parentElement.remove();
-
-    console.log("2");
 
     chrome.storage.local.get(["items"], (result) => {
         console.log("result.items: " + JSON.stringify(result.items));
         console.log("thisObj: " + JSON.stringify(thisObj));
-        console.log("3");
         for (elm of result.items) {
             console.log("elm: " + JSON.stringify(elm));
             if (JSON.stringify(elm) === JSON.stringify(thisObj)) {
@@ -156,6 +172,8 @@ function deleteCartItem(val) {
             }
         }
     });
+    getSum();
+    getNumItems();
 }
 
 /* table this cuz I need a way to get the price out of the item */
@@ -163,10 +181,10 @@ function getSum() {
     let prices = document.getElementsByClassName("item-info-price");
     let sum = 0;
     for (let i = 0; i < prices.length; i++) {
-        sum += prices[i].textContent;
+        sum += parseInt(prices[i].textContent.match(/(\d+)/));
     }
-    alert(prices[0].textContent);
-    return sum;
+    let total = document.querySelector(".sum-total");
+    total.textContent = "Total: $" + sum;
 }
 
 /* Gets the number of items on the interface itself
@@ -174,6 +192,6 @@ Returns - integer of numebr of items just on interface
 */
 function getNumItems() {
     let items = document.getElementsByClassName("grid-cart-item");
-    alert(items.length);
-    return items.length;
+    let numItems = document.querySelector(".num-items");
+    numItems.textContent = "Number of Items: " + items.length;
 }
