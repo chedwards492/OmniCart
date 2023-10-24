@@ -1,3 +1,4 @@
+//chrome.storage.local.clear();
 let numItems=0;
 populateCart();
 let btn = document.querySelector(".delete-button");
@@ -65,7 +66,12 @@ async function populateCart() {
 
 /* there's definitely some indexing issue with delete stuff, cuz when it gets down to the last item, it's null, and occasionally
 I try to delete the top element and it deletes the one just below, might wanna think about scrapping the current process cuz there's
-gotta be a better way to go about this? idk */
+gotta be a better way to go about this? idk 
+
+****DO THIS***  Might wanna think about inserting the elements in a different way, like maybe create the grid-cart-item element using 
+document.createElement or whatever so that we have that object, then insertAdjacentHtml, and then you'll have all the item info
+plus the actual item itself, and you can just find the btn within that object and set the function or whatever yeah do this 
+*/
 
 
 /* Adds html for parameter item. Does not change storage.local
@@ -73,49 +79,59 @@ gotta be a better way to go about this? idk */
 @param - item: the item to add to the cart */
 async function addCartItemToInterface(item) {
     console.log("addCartItemToInteface() ran");
-    await document.querySelector(".grid-cart").insertAdjacentHTML("beforeend", 
+    const parent = document.createElement("div");
+    parent.setAttribute("class", "grid-cart-item");
+    document.querySelector(".grid-cart").appendChild(parent);
+    await parent.insertAdjacentHTML("beforeend", 
     `
-    <div class="grid-cart-item">
-        <a href="https://www.google.com" target="_blank">'<img src="${item.image}" alt="Product Image" class="item-img"></a>    
-        <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
-            <div class="grid-item-info">
-                <a href="https://www.google.com" target="_blank" class="item-title">${item.title}</a>
-                <div class="item-store"></div>
-                <div class="grid-delete-copy">
-                    <button class="delete-button"></button>
-                    <button class="copy-link-btn" onclick="copyLink(this)">Copy link</button>
-                </div>
+    <a href="https://www.google.com" target="_blank">'<img src="${item.image}" alt="Product Image" class="item-img"></a>    
+    <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
+        <div class="grid-item-info">
+            <a href="https://www.google.com" target="_blank" class="item-title">${item.title}</a>
+            <div class="item-store"></div>
+            <div class="grid-delete-copy">
+                <button class="delete-button"></button>
+                <button class="copy-link-btn" onclick="copyLink(this)">Copy link</button>
             </div>
-            <div class="item-info-price">${item.price}</div>
         </div>
+        <div class="item-info-price">${item.price}</div>
     </div>
     `);
 
-    addDeleteFunctionality();
+    console.log("parent: " + JSON.stringify(parent));
+    addDeleteFunctionality(parent);
     getSum();
     getNumItems();
 }
 
 /* Adds the deleteCartItem function to buttons that do not have defined functionality */
-function addDeleteFunctionality() {
-    let temp = [];
-    let deleteBtnArr = [];
-    temp = document.getElementsByClassName("delete-button");
-    for (btn of temp) {
-        if (!!( btn.offsetWidth || btn.offsetHeight || btn.getClientRects().length)) {
-            deleteBtnArr.push(btn);
-        }
-    }
-    console.log("deleteBtnArr.length: " + deleteBtnArr.length);
-    for (let i = 0; i < deleteBtnArr.length; i++) {
-        console.log("onclick: " + deleteBtnArr[i].onclick);
-        console.log("deleteBtnArr[i]: " + deleteBtnArr[i]);
-        if (deleteBtnArr[i].onclick == null) {
-            console.log("adding delete functionality to: " + deleteBtnArr[i].parentElement.parentElement.querySelector(".item-title").textContent);
-            deleteBtnArr[i].onclick = () => {
-                deleteCartItem(deleteBtnArr[i]);
-            };
-        }
+// function addDeleteFunctionality() {
+//     let temp = [];
+//     let deleteBtnArr = [];
+//     temp = document.getElementsByClassName("delete-button");
+//     for (btn of temp) {
+//         if (!!( btn.offsetWidth || btn.offsetHeight || btn.getClientRects().length)) {
+//             deleteBtnArr.push(btn);
+//         }
+//     }
+//     console.log("deleteBtnArr.length: " + deleteBtnArr.length);
+//     for (let i = 0; i < deleteBtnArr.length; i++) {
+//         console.log("onclick: " + deleteBtnArr[i].onclick);
+//         console.log("deleteBtnArr[i]: " + deleteBtnArr[i]);
+//         if (deleteBtnArr[i].onclick == null) {
+//             console.log("adding delete functionality to: " + deleteBtnArr[i].parentElement.parentElement.querySelector(".item-title").textContent);
+//             deleteBtnArr[i].onclick = () => {
+//                 deleteCartItem(deleteBtnArr[i]);
+//             };
+//         }
+//     }
+// }
+
+function addDeleteFunctionality(el) {
+    let btn = el.querySelector(".delete-button");
+    console.log("adding delete functionality to: " + btn.parentElement.parentElement.querySelector(".item-title").textContent);
+    btn.onclick = () => {
+        deleteCartItem(btn);
     }
 }
 
@@ -136,11 +152,9 @@ undefined is the consistent error */
 
 /* Deletes specified cart item - trash can button */
 async function deleteCartItem(val) {
-    if (val == undefined || val == null) {
-        console.log("running addDeleteFunctionality()");
-        await addDeleteFunctionality();
-        console.log("ran addDeleteFunctinoality within deleteCartItem()");
-    }
+    // if (val == undefined || val == null) {
+    //     await addDeleteFunctionality();
+    // }
     console.log("val: " + val + "json val: " + JSON.stringify(val));
     console.log("val.parentElement" + val.parentElement);
     console.log("val.parentElement.parentElement" + JSON.stringify(val.parentElement.parentElement));
