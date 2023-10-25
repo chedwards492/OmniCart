@@ -95,10 +95,10 @@ async function addCartItemToInterface(item) {
     document.querySelector(".grid-cart").appendChild(parent);
     await parent.insertAdjacentHTML("beforeend", 
     `
-    <a href="https://www.google.com" target="_blank">'<img src="${item.image}" alt="Product Image" class="item-img"></a>    
+    <a href="${item.link}" target="_blank">'<img src="${item.image}" alt="Product Image" class="item-img"></a>    
     <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
         <div class="grid-item-info">
-            <a href="https://www.google.com" target="_blank" class="item-title">${item.title}</a>
+            <a href="${item.link}" target="_blank" class="item-title">${item.title}</a>
             <div class="item-store"></div>
             <div class="grid-delete-copy">
                 <button class="delete-button"></button>
@@ -115,28 +115,7 @@ async function addCartItemToInterface(item) {
     getNumItems();
 }
 
-/* Adds the deleteCartItem function to buttons that do not have defined functionality */
-// function addDeleteFunctionality() {
-//     let temp = [];
-//     let deleteBtnArr = [];
-//     temp = document.getElementsByClassName("delete-button");
-//     for (btn of temp) {
-//         if (!!( btn.offsetWidth || btn.offsetHeight || btn.getClientRects().length)) {
-//             deleteBtnArr.push(btn);
-//         }
-//     }
-//     console.log("deleteBtnArr.length: " + deleteBtnArr.length);
-//     for (let i = 0; i < deleteBtnArr.length; i++) {
-//         console.log("onclick: " + deleteBtnArr[i].onclick);
-//         console.log("deleteBtnArr[i]: " + deleteBtnArr[i]);
-//         if (deleteBtnArr[i].onclick == null) {
-//             console.log("adding delete functionality to: " + deleteBtnArr[i].parentElement.parentElement.querySelector(".item-title").textContent);
-//             deleteBtnArr[i].onclick = () => {
-//                 deleteCartItem(deleteBtnArr[i]);
-//             };
-//         }
-//     }
-// }
+
 
 function addDeleteFunctionality(el) {
     let btn = el.querySelector(".delete-button");
@@ -176,9 +155,11 @@ async function deleteCartItem(val) {
     let title = [].reduce.call(titleNode.childNodes, function(a, b) { return a + (b.nodeType === 3 ? b.textContent : ''); }, '');
     let priceNode = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-info-price");
     let price = [].reduce.call(priceNode.childNodes, function(a, b) { return a + (b.nodeType === 3 ? b.textContent : ''); }, '');
-    
+    let link = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-title").href;
+
     let thisObj = {
         image: image,
+        link: link,
         price: price,
         title: title
     };

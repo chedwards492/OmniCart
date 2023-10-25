@@ -8,32 +8,37 @@ document.addEventListener("click", () => {
     Guess the item, and send to cart.js */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { 
     if (message.message = "get-item-info") {
+        let link = message.url;
         let callGetItem;
         (callGetItem = async function() {
-            let item = await getItem();
+            let item = await getItem(link);
             addCartItem(item);
         })();
     }
+
+
     sendResponse({y: true});
     return true;
 });
 
 
 /* Called on shortcut command. Guesses item information
-    Return - object with guessed item information */
-async function getItem() {
+    Return - object with guessed item information 
+    Param - the link to the item page sent from service worker, used as link property in returned object */
+async function getItem(thisLink) {
     console.log("getItem() ran");
     let title = await guessTitle();
     let image = await guessImage(title);
     let price = await guessPrice();
+    let link = thisLink;
     return {
-        title: title, image: image, price: price
+        title: title, image: image, price: price, link: link
     };
 }
 
 /* Adds item to underlying cartItems array. Adds item to shopping cart interface 
-@return - void 
-@param - item: the item to add to cart */
+    Return - void 
+    Param - newItem: the item object to add to cart */
 function addCartItem(newItem) {
     console.log("addCartItem() ran ");
     chrome.storage.local.get(["items"], (result) => {
