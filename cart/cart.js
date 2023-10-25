@@ -20,12 +20,6 @@ let callPopulateCart;
     }));
 })();
 
-function printsl() {
-    chrome.storage.local.get(["items"], (result) => {
-        console.log(result.items);
-    })
-}
-
 
 
 
@@ -95,7 +89,7 @@ async function addCartItemToInterface(item) {
     document.querySelector(".grid-cart").appendChild(parent);
     await parent.insertAdjacentHTML("beforeend", 
     `
-    <a href="${item.link}" target="_blank">'<img src="${item.image}" alt="Product Image" class="item-img"></a>    
+    <a href="${item.link}" target="_blank"><img src="${item.image}" alt="Product Image" class="item-img"></a>    
     <div class="grid-item-info-price"> <!--item title, price, link, etc.-->
         <div class="grid-item-info">
             <a href="${item.link}" target="_blank" class="item-title">${item.title}</a>
