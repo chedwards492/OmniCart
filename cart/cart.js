@@ -1,22 +1,32 @@
 //chrome.storage.local.clear();
 let numItems=0;
-populateCart();
-let btn = document.querySelector(".delete-button");
-function onButtonClick() {
-    alert('yup clicked');
+let callPopulateCart;
+(callPopulateCart = async function() {
+    await populateCart();
+
+
+    if (window.addEventListener("load", () => {
+        console.log("loaded");
+        let deleteBtnArr = [];
+        deleteBtnArr = document.getElementsByClassName("delete-button");
+        for (let i = 0; i < deleteBtnArr.length; i++) {
+            console.log("adding delete functionality to: " + deleteBtnArr[i].parentElement.parentElement.querySelector(".item-title").textContent);
+            let temp = deleteBtnArr[i];
+            temp.onclick = () => {
+
+                deleteCartItem(temp);
+            };
+        }
+    }));
+})();
+
+function printsl() {
+    chrome.storage.local.get(["items"], (result) => {
+        console.log(result.items);
+    })
 }
 
-if (window.addEventListener("load", () => {
-    console.log("loaded");
-    let deleteBtnArr = [];
-    deleteBtnArr = document.getElementsByClassName("delete-button");
-    for (let i = 0; i < deleteBtnArr.length; i++) {
-        console.log("adding delete functionality to: " + deleteBtnArr[i].parentElement.parentElement.querySelector(".item-title").textContent);
-        deleteBtnArr[i].onclick = () => {
-            deleteCartItem(deleteBtnArr[i]);
-        };
-    }
-}));
+
 
 
 
@@ -40,6 +50,7 @@ chrome.storage.onChanged.addListener( () =>  {
         }
         numItems = result.items.length;
         console.log("new numItems " + numItems);
+        console.log("result.items " + JSON.stringify(result.items));
     })
 });
 
@@ -153,7 +164,8 @@ undefined is the consistent error */
 /* Deletes specified cart item - trash can button */
 async function deleteCartItem(val) {
     // if (val == undefined || val == null) {
-    //     await addDeleteFunctionality();
+    //     await location.reload();
+    //     deleteCartItem(val);
     // }
     console.log("val: " + val + "json val: " + JSON.stringify(val));
     console.log("val.parentElement" + val.parentElement);

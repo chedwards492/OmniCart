@@ -5,16 +5,12 @@ document.addEventListener("click", () => {
 //chrome.storage.local.clear();
 
 /* Receive message from service worker upon command
-    Guess the item, and send to cart.js
-This might bring up problems if callgetItem doesn't return before return true runs */
+    Guess the item, and send to cart.js */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { 
     if (message.message = "get-item-info") {
         let callGetItem;
         (callGetItem = async function() {
             let item = await getItem();
-            // send item information to cart.js NEED TO GET RID OF THIS WHEN IMPLEMENT ONCHANGED EVENT LISTENER
-            //chrome.runtime.sendMessage({message: "send-item-info", item: item}); // not sure if necessary, cuz could just do a storage.onChanged, but that's a lil more complicated
-            // instead of ^ try adding to local storage
             addCartItem(item);
         })();
     }
