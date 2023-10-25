@@ -1,6 +1,5 @@
 //chrome.storage.local.clear();
 let numItems=0;
-console.log("HELLOOO");
 let callPopulateCart;
 (callPopulateCart = async function() {
     await populateCart();
@@ -8,14 +7,18 @@ let callPopulateCart;
 
     if (window.addEventListener("load", () => {
         console.log("loaded");
+        let copyBtnArr = [];
         let deleteBtnArr = [];
+        copyBtnArr = document.getElementsByClassName("copy-link-button");
         deleteBtnArr = document.getElementsByClassName("delete-button");
         for (let i = 0; i < deleteBtnArr.length; i++) {
-            console.log("adding delete functionality to: " + deleteBtnArr[i].parentElement.parentElement.querySelector(".item-title").textContent);
-            let temp = deleteBtnArr[i];
-            temp.onclick = () => {
-
-                deleteCartItem(temp);
+            let tempCopy = copyBtnArr[i];
+            tempCopy.onclick = () => {
+                deleteCartItem(tempCopy);
+            };
+            let tempDelete = deleteBtnArr[i];
+            tempDelete.onclick = () => {
+                deleteCartItem(tempDelete);
             };
         }
     }));
@@ -97,7 +100,7 @@ async function addCartItemToInterface(item) {
             <div class="item-store"></div>
             <div class="grid-delete-copy">
                 <button class="delete-button"></button>
-                <button class="copy-link-btn" onclick="copyLink(this)">Copy link</button>
+                <button class="copy-link-button">Copy link</button>
             </div>
         </div>
         <div class="item-info-price">${item.price}</div>
@@ -105,18 +108,21 @@ async function addCartItemToInterface(item) {
     `);
 
     console.log("parent: " + JSON.stringify(parent));
-    addDeleteFunctionality(parent);
+    addButtonFunctionality(parent);
     getSum();
     getNumItems();
 }
 
 
 
-function addDeleteFunctionality(el) {
-    let btn = el.querySelector(".delete-button");
-    console.log("adding delete functionality to: " + btn.parentElement.parentElement.querySelector(".item-title").textContent);
-    btn.onclick = () => {
-        deleteCartItem(btn);
+function addButtonFunctionality(el) {
+    let copyBtn = el.querySelector(".copy-link-button");
+    copyBtn.onclick = () => {
+        copyLink(copyBtn);
+    }
+    let deleteBtn = el.querySelector(".delete-button");
+    deleteBtn.onclick = () => {
+        deleteCartItem(deleteBtn);
     }
 }
 

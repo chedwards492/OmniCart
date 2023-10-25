@@ -46,6 +46,8 @@ header a {
 
 .main {
     margin: 0.6rem;
+    margin-top: 1rem;
+    
 
     font-family: 'Inter', sans-serif;
     font-weight: 400;
@@ -62,7 +64,7 @@ header a {
 .grid-cart {
     display: grid;
     /* border: 2px blue solid; */
-    gap: 1.2rem;
+    gap: 1.2xrem;
 }
 
 .grid-cart-item {
@@ -170,7 +172,7 @@ header a {
 }
 
 
-.copy-link-btn {
+.copy-link-button {
     min-height: 2rem;
     width: 4.3rem;
     font-size: 12px;

@@ -156,7 +156,7 @@ header {
 }
 
 
-.copy-link-btn {
+.copy-link-button {
     min-height: 2rem;
     width: 4.3rem;
     font-size: 12px;
@@ -326,7 +326,7 @@ header {
         margin-left: 0.3rem;
     }
 
-    .copy-link-btn {
+    .copy-link-button {
         min-height: 2rem;
         width: 4.3rem;
         font-size: 12px;
