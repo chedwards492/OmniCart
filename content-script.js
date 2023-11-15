@@ -1,11 +1,5 @@
-document.addEventListener("click", () => {
-    console.log("clicked content script!!");
-});
-
-//chrome.storage.local.clear();
-
 /* Receive message from service worker upon command
-    Guess the item, and send to cart.js */
+    Runs guess functions and sends to cart.js */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { 
     if (message.message = "get-item-info") {
         let link = message.url;
@@ -23,10 +17,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
 /* Called on shortcut command. Guesses item information
-    Return - object with guessed item information 
-    Param - the link to the item page sent from service worker, used as link property in returned object */
+@return - object with guessed item information 
+@param - the link to the item page sent from service worker, used as link property in returned object */
 async function getItem(thisLink) {
-    console.log("getItem() ran");
     let title = await guessTitle();
     let image = await guessImage(title);
     let price = await guessPrice();
@@ -37,10 +30,9 @@ async function getItem(thisLink) {
 }
 
 /* Adds item to underlying cartItems array. Adds item to shopping cart interface 
-    Return - void 
-    Param - newItem: the item object to add to cart */
+@return - void 
+@param - newItem: the item object to add to cart */
 function addCartItem(newItem) {
-    console.log("addCartItem() ran ");
     chrome.storage.local.get(["items"], (result) => {
         if (typeof(result.items) != undefined && result.items instanceof Array) {
             result.items.push(newItem);
@@ -49,12 +41,6 @@ function addCartItem(newItem) {
     });
 }
 
-/* Here begins the process of trying to create spew logic and conditional statements "smart" enough to 
-    distinguish a product title, image, and price from other text on a page. Program this last b/c it's not
-    stupid important, just need some general logic. Hopefully will not have to deal with js on pages as we'll be
-    working in the actual product's page, not like a page with a bunch of products on it. Want Product title, image 
-    (maybe even images if it's feasible), price, link, and which website it was from. Will then use that data to 
-    piece together a little object in our shopping cart with that information readiyl available*/
 const PROD = "product";
 const ITEM = "item";
 const NAME = "name";
@@ -64,10 +50,9 @@ const H2 = "H2";
 const H3 = "H3";
 
 /* Guesses the product title 
-    Returns - string of the guessed product title */
+@return - string of the guessed product title */
 function guessTitle() {
 
-    // get all nodes, then get just the nodes that have direct text in them
     let potentialNodes = []; 
     let aNodes = document.getElementsByTagName("*");
     for (let k = 0; k < aNodes.length; k++) {
@@ -76,11 +61,9 @@ function guessTitle() {
         }
     }
 
-    // only get visible elements from the potential tNodes
     let tNodes = potentialNodes.filter(x => x.offsetWidth !== 0 || x.offsetHeight !== 0);
 
     for (let i = 0; i < tNodes.length; i++) {        
-    // 1
         if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
         (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(NAME)) ||
         (tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
@@ -99,7 +82,7 @@ function guessTitle() {
             
         }
     }
-    // 2
+    
     for (let i = 0; i < tNodes.length; i++) {
         if ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string") ) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(NAME)) || 
                 (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(ITEM) && tNodes[i].className.toLowerCase().includes(TITLE)) ) ) ||
@@ -111,7 +94,7 @@ function guessTitle() {
                     
         }
     }
-    // added
+    
     for (let i = 0; i < tNodes.length; i++) {
         if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
                 (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(NAME)) ||
@@ -130,7 +113,6 @@ function guessTitle() {
         }
     }
 
-    // get all nodes, p&n + h1 || h2
     let potentialAllNodes = document.getElementsByTagName("*");
     let allNodes = [];
     for (let k = 0; k < potentialAllNodes.length; k++) {
@@ -139,7 +121,6 @@ function guessTitle() {
         }
     }
     
-
     for (let i = 0; i < allNodes.length; i++) {
         if ( ( ( (allNodes[i].className != null && (typeof allNodes[i].className == "string")) && 
             ( (allNodes[i].className.toLowerCase().includes(PROD) && allNodes[i].className.toLowerCase().includes(TITLE)) ||
@@ -164,8 +145,6 @@ function guessTitle() {
         }
     }
 
-
-    // added to separate above h1's and h2's from h3's
     for (let i = 0; i < tNodes.length; i++) {
         if ( ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
                 (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(NAME)) ||
@@ -184,7 +163,6 @@ function guessTitle() {
         }
     }
 
-    // all nodes, p&t + h3
     for (let i = 0; i < allNodes.length; i++) {
         if ( ( ( (allNodes[i].className != null && (typeof allNodes[i].className == "string")) && 
             ( (allNodes[i].className.toLowerCase().includes(PROD) && allNodes[i].className.toLowerCase().includes(TITLE)) ||
@@ -209,7 +187,6 @@ function guessTitle() {
         }
     }
 
-    // 3
     for (let i = 0; i < tNodes.length; i++) {
         if ( ( (tNodes[i].className != null && (typeof tNodes[i].className == "string")) && 
             ( (tNodes[i].className.toLowerCase().includes(PROD) && tNodes[i].className.toLowerCase().includes(TITLE)) ||
@@ -231,7 +208,6 @@ function guessTitle() {
 
     
 
-    // last resort - just get first h1, h2, or h3 element you see, should go below allNodes look up
     for (let i = 0; i < allNodes.length; i++) {
         if (allNodes[i].tagName == H1 || allNodes[i].tagName == H2 || allNodes[i].tagName == H3) {
             if (allNodes[i].textContent != null) {
@@ -247,7 +223,7 @@ function guessTitle() {
 }
 
 /* Determines whether a node contains direct text content
-    Returns boolean value */
+@returns boolean value true if node contains direct text content */
 function containsDirectText(el) {
     return [...el.childNodes]
         .some(n => n.nodeType === Node.TEXT_NODE
@@ -255,8 +231,8 @@ function containsDirectText(el) {
   }
 
 /* Grabs all text nodes under a node
-    Param - a node
-    Returns - array of text nodes under parameter node */
+@returns - array of text nodes under parameter node
+@param - the ancestor of all text nodes to be retrieved */
 function textNodesUnder(el) {
     let n, a = [], walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
     while(n=walk.nextNode()) a.push(n);
@@ -264,8 +240,8 @@ function textNodesUnder(el) {
 }
 
 /* Guesses the product image
-    Param - the returned value from guessTitle
-    Returns - the src attribute of the img node, null otherwise */
+@returns - the src attribute of the img node, null otherwise
+@param - the returned guessed title from function guessTitle */
 function guessImage(name) {
     let imgs = document.getElementsByTagName("img");
 
@@ -278,18 +254,9 @@ function guessImage(name) {
         }
     }
 
-    // 1 - use retrieved title and search in imgs' src or setsrc
     for (let i = 0; i < imgs.length; i++) {
         let img = imgs[i];
         if (isVisible(img)) {
-            
-            /* sometimes websites don't have alt, need other methods
-            some websites have srcset's, responsive images, and should probably check those first if exists, then src if exists
-            didn't work on ebay, no idea why
-            yeah I think this alt="" method is best, just need a couple backups, like if it's in a range of dimensions? or it's the 
-            biggest img on the page, or if in a ImgContainer class or something
-            */
-            // string split into 4, maybe need to check how long a string is before we do this, cuz small strings could just get "ar" or something short
             let str1 = name.substring(0, (name.length)/4);
             let str2 = name.substring((name.length)/4, (name.length)/2);
             let str3 = name.substring((name.length)/2, ((name.length)*(3/4)));
@@ -315,13 +282,9 @@ function guessImage(name) {
 }
 
 /* Guesses the product price
-    Returns - string value of product price */
+@returns - string value of product price */
 function guessPrice() {
     let aNodes = document.getElementsByTagName("*");
-
-    /* go thru nodes, if visible, if has textContent good
-        check if contains direct text, check if that direct text has a $, then check if it's near top, then check strikethru,
-        then check if parent has a classname, and if it's a string, and if it includes "price"*/
 
     let pNodes = [];
     for (let i = 0; i < aNodes.length; i++) {
@@ -362,14 +325,8 @@ function guessPrice() {
 }
 
 /* Tells whether an element is visible on the page
-Param - the element of significance
-Returns boolean value whether param el is visible on page*/
+@returns boolean value true if element is visible on page
+@param - the element to check */
 function isVisible(el) {
     return !!( el.offsetWidth || el.offsetHeight || el.getClientRects().length);
 }
-
-
-
-
-/* https://stackoverflow.com/questions/13917047/how-to-get-a-content-script-to-load-after-a-pages-javascript-has-executed
-to wait for js to load */ 

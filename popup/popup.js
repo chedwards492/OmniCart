@@ -1,12 +1,11 @@
-//chrome.storage.local.clear();
 let numItems=0;
 let callPopulateCart;
+
+
 (callPopulateCart = async function() {
     await populateCart();
 
-
     if (window.addEventListener("load", () => {
-        console.log("loaded");
         let copyBtnArr = [];
         let deleteBtnArr = [];
         copyBtnArr = document.getElementsByClassName("copy-link-button");
@@ -27,28 +26,22 @@ let callPopulateCart;
 
 
 
-
+/* Initialize storage and counter of items */
 chrome.storage.local.get(["items"], async (result) => {
-    console.log("set items");
     if (result.items == undefined) {
         chrome.storage.local.set( {items: []} );
-        console.log("initialized backend array");
     }
     numItems = result.items.length;
-    console.log("numItems: " + numItems);
     
 });
 
 /* Listen for "Add item" command, update cart html with new item if so */
 chrome.storage.onChanged.addListener( () =>  {
-    console.log("Storage Changed.");
     chrome.storage.local.get(["items"], (result) => {
         if (numItems <= result.items.length) {
             addCartItemToInterface(result.items[result.items.length-1]);
         }
         numItems = result.items.length;
-        console.log("new numItems " + numItems);
-        console.log("result.items " + JSON.stringify(result.items));
     })
 });
 
@@ -59,11 +52,9 @@ chrome.storage.onChanged.addListener( () =>  {
 /* Populates items into cart interface from storage. Called on startup
 @return - void */
 async function populateCart() {
-    console.log("populateCart() ran");
     let arr;
     await chrome.storage.local.get(["items"], async (result) => {
         arr = await result.items
-        console.log("populateCart() arr: " + result.items);
         if (arr.length != 0) {
             for (let item of arr) {
                 addCartItemToInterface(item);
@@ -73,21 +64,11 @@ async function populateCart() {
     });
 }
 
-/* there's definitely some indexing issue with delete stuff, cuz when it gets down to the last item, it's null, and occasionally
-I try to delete the top element and it deletes the one just below, might wanna think about scrapping the current process cuz there's
-gotta be a better way to go about this? idk 
-
-****DO THIS***  Might wanna think about inserting the elements in a different way, like maybe create the grid-cart-item element using 
-document.createElement or whatever so that we have that object, then insertAdjacentHtml, and then you'll have all the item info
-plus the actual item itself, and you can just find the btn within that object and set the function or whatever yeah do this 
-*/
-
 
 /* Adds html for parameter item. Does not change storage.local
 @return - void
 @param - item: the item to add to the cart */
 async function addCartItemToInterface(item) {
-    console.log("addCartItemToInteface() ran");
     const parent = document.createElement("div");
     parent.setAttribute("class", "grid-cart-item");
     document.querySelector(".grid-cart").appendChild(parent);
@@ -107,14 +88,14 @@ async function addCartItemToInterface(item) {
     </div>
     `);
 
-    console.log("parent: " + JSON.stringify(parent));
     addButtonFunctionality(parent);
     getSum();
     getNumItems();
 }
 
 
-
+/* Adds copy and delete functionality to corresponding buttons 
+@param - wrapper element of buttons */
 function addButtonFunctionality(el) {
     let copyBtn = el.querySelector(".copy-link-button");
     copyBtn.onclick = () => {
@@ -127,30 +108,16 @@ function addButtonFunctionality(el) {
 }
 
 
-/* this alerts properly but the link does not acc get copied to my clipboard, might just be b/c it's a live server tho so idk 
-    https://stackoverflow.com/questions/52054635/copy-clipboard-function-working-locally-but-not-working-server */
+/* Copies item link to clipboard 
+@param - the button of the specific item that was clicked */
 function copyLink(val) {
     let copiedLink = val.parentElement.parentElement.firstElementChild.getAttribute("href");
-    //alert("HELLOOOO" + copiedLink);
-
     navigator.clipboard.writeText(copiedLink);
-
-    alert("copied the link: " + copiedLink);
 }
 
-/* delete has issues when you add some stuff to cart, close the tab, then open it back up and try deleting things, parentElement 
-undefined is the consistent error */
-
-/* Deletes specified cart item - trash can button */
+/* Deletes specified cart item, called by clicking trash can icon button
+@param - wrapper element of trash can button */
 async function deleteCartItem(val) {
-    // if (val == undefined || val == null) {
-    //     await location.reload();
-    //     deleteCartItem(val);
-    // }
-    console.log("val: " + val + "json val: " + JSON.stringify(val));
-    console.log("val.parentElement" + val.parentElement);
-    console.log("val.parentElement.parentElement" + JSON.stringify(val.parentElement.parentElement));
-    console.log("deleteCartItem ran, val: " + val.parentElement.parentElement.querySelector(".item-title").textContent);
     let image = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-img").getAttribute("src");
     let titleNode = val.parentElement.parentElement.parentElement.parentElement.querySelector(".item-title");
     let title = [].reduce.call(titleNode.childNodes, function(a, b) { return a + (b.nodeType === 3 ? b.textContent : ''); }, '');
@@ -168,12 +135,8 @@ async function deleteCartItem(val) {
     val.parentElement.parentElement.parentElement.parentElement.remove();
 
     chrome.storage.local.get(["items"], (result) => {
-        console.log("result.items: " + JSON.stringify(result.items));
-        console.log("thisObj: " + JSON.stringify(thisObj));
         for (elm of result.items) {
-            console.log("elm: " + JSON.stringify(elm));
             if (JSON.stringify(elm) === JSON.stringify(thisObj)) {
-                console.log("4");
                 let ind = result.items.indexOf(elm);
                 result.items.splice(ind, 1);
                 chrome.storage.local.set(result);
@@ -184,7 +147,7 @@ async function deleteCartItem(val) {
     getNumItems();
 }
 
-/* table this cuz I need a way to get the price out of the item */
+/* Calculate sum of products in cart to be displayed under summary */
 function getSum() {
     let prices = document.getElementsByClassName("item-info-price");
     let sum = 0;
@@ -196,7 +159,7 @@ function getSum() {
 }
 
 /* Gets the number of items on the interface itself
-Returns - integer of numebr of items just on interface
+@return - integer of numebr of items just on interface
 */
 function getNumItems() {
     let items = document.getElementsByClassName("grid-cart-item");

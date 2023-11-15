@@ -187,7 +187,7 @@ async function deleteCartItem(val) {
 /* table this cuz I need a way to get the price out of the item */
 function getSum() {
     let prices = document.getElementsByClassName("item-info-price");
-    let sum = 0;
+    let sum = 0.0;
     for (let i = 0; i < prices.length; i++) {
         sum += parseInt(prices[i].textContent.match(/(\d+)/));
     }
